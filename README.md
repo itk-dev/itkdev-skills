@@ -28,4 +28,5 @@ claude plugin add itk-dev/itkdev-skills
 | Agent | Description |
 |-------|-------------|
 | `itkdev-code-review` | Automated PR review against ITK Dev standards |
+| `itkdev-create-project` | Create new Drupal/Symfony projects with ITK Dev Docker setup |
 | `itkdev-issue-workflow` | Autonomous GitHub issue workflow (runs in isolated subagent context) |
