@@ -16,9 +16,29 @@ task                    # List all available tasks with descriptions
 task --list-all         # List all tasks including those without descriptions
 ```
 
-## Taskfile.yml Structure
+## New Project Taskfile Header
 
-ITK Dev Taskfiles follow a standard structure with variables and task composition:
+When generating a Taskfile for a new project, always use this canonical header:
+
+```yaml
+version: "3"
+
+# https://taskfile.dev/usage/#env-files
+dotenv: [".env.local", ".env"]
+
+vars:
+  # https://taskfile.dev/reference/templating/
+  BASE_URL: '{{.TASK_BASE_URL | default .COMPOSE_SERVER_DOMAIN | default .COMPOSE_DOMAIN | default "http://docs.local.itkdev.dk"}}'
+  DOCKER_COMPOSE: '{{.TASK_DOCKER_COMPOSE | default "docker compose"}}'
+```
+
+This header uses `DOCKER_COMPOSE` with `default "docker compose"` and reads environment variables from dotenv files. Use this for all newly created projects.
+
+**Note:** Legacy projects may use the older `DOCKER: itkdev-docker-compose` variable pattern (see below). Both are valid — do not migrate existing projects unless requested.
+
+## Taskfile.yml Structure (Legacy Pattern)
+
+Existing ITK Dev Taskfiles may follow this structure with `itkdev-docker-compose` wrapper variables:
 
 ```yaml
 version: '3'
@@ -101,6 +121,19 @@ drush:
 ```
 
 Usage: `task composer -- require drupal/admin_toolbar` or `task drush -- cr`
+
+## Symfony Console Wrapper
+
+For Symfony projects using the new project header pattern:
+
+```yaml
+console:
+  desc: Run Symfony console command
+  cmds:
+    - "{{.DOCKER_COMPOSE}} exec phpfpm bin/console {{.CLI_ARGS}}"
+```
+
+Usage: `task console -- cache:clear` or `task console -- doctrine:migrations:migrate`
 
 ## Asset Building
 

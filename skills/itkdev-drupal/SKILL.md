@@ -127,9 +127,35 @@ services:
 
 ## Theme Development
 
-### Creating a New Theme
+When setting up a theme, ask the user which approach they want:
 
-Basic structure:
+- **ITK Dev Base Theme** — uses [Tailwind CSS](https://tailwindcss.com/) via the [ITK Dev base theme](https://github.com/itk-dev/itkdev_base_theme) starterkit. Recommended for most projects.
+- **Custom theme** — a manually scaffolded theme with no base theme dependency.
+
+### Option A: ITK Dev Base Theme (recommended)
+
+1. Ask the user for a **theme machine name** (e.g. `my_custom_theme`) and a **human-readable theme name** (e.g. `"My Custom Theme"`).
+
+2. Require the base theme package:
+   ```bash
+   docker compose exec phpfpm composer require itk-dev/itkdev_base_theme
+   ```
+
+3. Generate the subtheme. The theme must be placed in `themes/custom` for base theme references to work:
+   ```bash
+   docker compose exec phpfpm php /app/web/core/scripts/drupal generate-theme THEMENAME \
+     --name="THEME READABLE NAME" \
+     --path="themes/custom" \
+     --starterkit=starterkit_project_theme
+   ```
+   Replace `THEMENAME` with the machine name and `THEME READABLE NAME` with the readable name.
+
+4. Inform the user to follow the README inside the generated theme directory (`web/themes/custom/THEMENAME/README.md`) for further setup (Tailwind CSS build, etc.).
+
+### Option B: Custom theme
+
+Ask the user for a **theme machine name** and a **human-readable theme name**, then scaffold the following structure:
+
 ```
 themes/custom/theme_name/
 ├── theme_name.info.yml
@@ -141,7 +167,7 @@ themes/custom/theme_name/
 └── templates/
 ```
 
-### Theme info.yml Template
+Theme `info.yml` template:
 ```yaml
 name: 'Theme Name'
 type: theme
@@ -152,6 +178,55 @@ base theme: stable9
 libraries:
   - theme_name/global-styling
 ```
+
+## Site Installation
+
+**Prerequisite:** Drush is not included in `drupal/recommended-project`. If it hasn't been installed yet, require it first:
+```bash
+docker compose exec phpfpm composer require drush/drush --no-interaction
+```
+
+On a freshly scaffolded Drupal project (via `composer create-project`), `settings.php` does not exist — only `default.settings.php` is provided. You must create it before running `drush site:install`, or Drush will fail with `Call to a member function getInstallTasks() on null`:
+
+```bash
+docker compose exec phpfpm bash -c 'cp /app/web/sites/default/default.settings.php /app/web/sites/default/settings.php && chmod 666 /app/web/sites/default/settings.php'
+```
+
+After creating `settings.php`, make the following changes. **Important:** The `Read` and `Edit` tools may not work on files in newly created project directories due to sandbox/permission restrictions. Use `docker compose exec phpfpm` commands to read and edit `settings.php` inside the container instead (e.g. `sed -i`, `cat -n`, `grep -n`, `cat >>`). See the agent's sandbox note for details.
+
+1. **Config sync directory:** Set `$settings['config_sync_directory']` to `'../config/sync'`.
+   ```bash
+   docker compose exec phpfpm sed -i "s|# \$settings\['config_sync_directory'\] = '/directory/outside/webroot';|\$settings['config_sync_directory'] = '../config/sync';|" /app/web/sites/default/settings.php
+   ```
+   Also create the directory:
+   ```bash
+   docker compose exec phpfpm mkdir -p /app/config/sync
+   ```
+2. **Skip permissions hardening:** Uncomment `$settings['skip_permissions_hardening'] = TRUE;` so file permissions are never hardened. Note: this setting may not exist in all Drupal versions — skip if not present.
+3. **Local settings override:** Remove the commented-out `settings.local.php` include block and append an uncommented version at the very end of the file:
+   ```bash
+   # Remove the commented block
+   docker compose exec phpfpm sed -i '/^#$/,/^# }$/d' /app/web/sites/default/settings.php
+   # Append uncommented block at end
+   docker compose exec phpfpm bash -c 'cat >> /app/web/sites/default/settings.php << '\''EOFPHP'\''
+
+   if (file_exists($app_root . '\''/'\'' . $site_path . '\''/settings.local.php'\'')) {
+     include $app_root . '\''/'\'' . $site_path . '\''/settings.local.php'\'';
+   }
+   EOFPHP'
+   ```
+
+Ask the user which install profile to use. If the user does not specify, default to **minimal**:
+- **minimal** (default) — bare-bones installation with no pre-configured content types or modules
+- **standard** — includes default content types, blocks, and commonly used modules
+
+Then install with the chosen profile and `--db-url` matching the MariaDB container credentials:
+
+```bash
+docker compose exec phpfpm vendor/bin/drush site:install <profile> --yes --db-url=mysql://db:db@mariadb:3306/db --account-name=admin --account-pass=admin
+```
+
+Without a profile and `--db-url`, Drush cannot resolve the install profile or connect to the database.
 
 ## Drush Commands
 

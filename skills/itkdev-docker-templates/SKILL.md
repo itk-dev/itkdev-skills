@@ -75,6 +75,26 @@ itkdev-docker-compose template:update --force
 
 After installation, the `.env` file will contain `ITKDEV_TEMPLATE=<template-name>`.
 
+### Interactive Prompts
+
+The `template:install` command has three interactive prompts that will hang in a non-interactive shell:
+
+1. `Are you sure you want to install the <name> template in <dir> (y|N)?` — uses `read -p ... -n 1 -r`, reads a single character. Must send `y`.
+2. `Project name (<dir-name>)?` (default: directory name) — uses `read -e`, accepts newline for default.
+3. `Domain [<dir-name>.local.itkdev.dk]?` (default: `<dir-name>.local.itkdev.dk`) — uses `read -e`, accepts newline for default.
+
+The confirmation prompt (`y|N`) is **always** shown (even on fresh installs). For non-interactive shells, pipe input:
+```bash
+printf 'y\n\n' | itkdev-docker-compose template:install <template-name>
+```
+This answers `y` to the confirmation and accepts defaults for project name and domain.
+
+Using `--force` skips only the confirmation prompt but still requires the project name and domain inputs.
+
+### Version Mismatch
+
+If the exact version template doesn't exist (e.g. the user wants Symfony 7 but only `symfony-6` is available), use the closest available template — the Docker setup is compatible across versions. The actual framework version is determined by the `composer create-project` step, not the template.
+
 ## Setup Workflows
 
 ### New Drupal 11 Project
@@ -107,40 +127,31 @@ After installation, the `.env` file will contain `ITKDEV_TEMPLATE=<template-name
 
 ## Procedural: List Templates
 
-When the user asks to list available templates, run:
+When the user asks to list available templates, use `WebFetch` (not `curl` or `gh` via Bash, which may be blocked by the sandbox):
 
-```bash
-gh api repos/itk-dev/devops_itkdev-docker/contents/templates --jq '.[].name'
 ```
-
-This returns directory names from the templates folder.
+WebFetch url: https://api.github.com/repos/itk-dev/devops_itkdev-docker/contents/templates?ref=develop
+prompt: List all directory names (the "name" field) from this JSON array. Only return the names, one per line.
+```
 
 ## Procedural: Get Template Files
 
 To list files in a specific template:
 
-```bash
-gh api repos/itk-dev/devops_itkdev-docker/contents/templates/{template} --jq '.[].name'
+```
+WebFetch url: https://api.github.com/repos/itk-dev/devops_itkdev-docker/contents/templates/{template}?ref=develop
+prompt: List all file/directory names (the "name" field) from this JSON array. Only return the names, one per line.
 ```
 
-For nested directories (like `.docker/` or `.github/`), follow up with:
-
-```bash
-gh api repos/itk-dev/devops_itkdev-docker/contents/templates/{template}/{subdir} --jq '.[].name'
-```
+For nested directories (like `.docker/` or `.github/`), follow up with the subdirectory path in the URL.
 
 ## Procedural: Get Template File Content
 
 To read a specific template file:
 
-```bash
-curl -sL "https://raw.githubusercontent.com/itk-dev/devops_itkdev-docker/develop/templates/{template}/{file}"
 ```
-
-Or via GitHub CLI:
-
-```bash
-gh api repos/itk-dev/devops_itkdev-docker/contents/templates/{template}/{file} --jq '.content' | base64 -d
+WebFetch url: https://raw.githubusercontent.com/itk-dev/devops_itkdev-docker/develop/templates/{template}/{file}
+prompt: Return the full file content exactly as-is.
 ```
 
 ## Procedural: Compare Project Against Template
