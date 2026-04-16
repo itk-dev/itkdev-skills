@@ -21,6 +21,7 @@ claude plugin add itk-dev/itkdev-skills
 | `itkdev-drupal` | Drupal 10/11 development assistance (code auditing, module/theme development, configuration management) |
 | `itkdev-github-guidelines` | GitHub workflow guidelines (branch naming, commits, changelogs, PRs) |
 | `itkdev-issue-workflow` | Autonomous GitHub issue workflow |
+| `itkdev-symfony` | Symfony development assistance (scaffolding, database configuration, console commands, Symfony configuration) |
 | `itkdev-validate-standards` | Project standards validation against ITK Dev conventions |
 
 ## Agents
