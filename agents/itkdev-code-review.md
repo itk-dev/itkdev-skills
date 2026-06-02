@@ -4,6 +4,9 @@ description: "Code review agent for pull requests. Delegates to this agent when 
 skills:
   - itkdev-github-guidelines
   - itkdev-drupal
+  - itkdev-review-php
+  - itkdev-review-python
+  - itkdev-review-javascript
 memory: project
 ---
 
@@ -100,18 +103,20 @@ Apply Drupal-specific checks only when a Drupal project is detected.
 - Missing error handling for external calls
 - TODO/FIXME/HACK comments introduced in this PR
 
-### File-Type Specific Checks
+### Language-Specific Checks (delegated to review skills)
 
-**PHP:**
-- Missing type declarations on new functions/methods
-- `@todo` or `@fixme` annotations
-- Direct superglobal access (`$_GET`, `$_POST`, `$_REQUEST`)
-- Raw SQL queries (potential SQL injection)
+Detect the languages in the diff from the changed file extensions, then apply the checklist from
+the matching `itkdev-review-<lang>` skill. Apply only the skills whose languages appear in the diff.
 
-**JavaScript/TypeScript:**
-- `var` usage (should be `const`/`let`)
-- `any` type usage in TypeScript
-- Missing error handling on async/await or promises
+| Extensions in diff | Apply skill |
+|--------------------|-------------|
+| `.php` | `itkdev-review-php` |
+| `.py` | `itkdev-review-python` |
+| `.js`, `.jsx`, `.ts`, `.tsx`, `.mjs`, `.cjs` | `itkdev-review-javascript` |
+
+Each skill provides the prioritized Critical/High/Medium/Low checklist, language-specific deep
+checks, and a security pass for that language — map its findings into this report's Critical /
+Warning / Suggestion severities.
 
 **Twig:**
 - Unescaped output (`|raw` filter) without justification

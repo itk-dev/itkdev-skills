@@ -1,5 +1,6 @@
 ---
 name: itkdev-taskfile
+user-invocable: true
 description: Taskfile development workflows for ITK Dev projects. Use when working with Taskfile.yml, running task commands, setting up task automation, coding standards, site management, asset building, or asking about available tasks.
 ---
 

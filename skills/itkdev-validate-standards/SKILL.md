@@ -1,5 +1,6 @@
 ---
 name: itkdev-validate-standards
+user-invocable: true
 description: |
   Validate project against itk-dev Docker and development conventions from
   itk-dev/devops_itkdev-docker. Use when: (1) auditing Docker setup, (2)

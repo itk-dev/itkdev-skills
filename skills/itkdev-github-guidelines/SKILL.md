@@ -1,5 +1,6 @@
 ---
 name: itkdev-github-guidelines
+user-invocable: true
 description: GitHub workflow guidelines for itk-dev team. Use when working with Git, creating branches, making commits, opening pull requests, or any GitHub-related development tasks. Ensures compliance with team conventions for branching, commits, changelogs, and PR workflows.
 ---
 

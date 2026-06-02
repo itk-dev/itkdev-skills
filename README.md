@@ -22,6 +22,10 @@ claude plugin add itk-dev/itkdev-skills
 | `itkdev-github-guidelines` | GitHub workflow guidelines (branch naming, commits, changelogs, PRs) |
 | `itkdev-issue-workflow` | Autonomous GitHub issue workflow |
 | `itkdev-validate-standards` | Project standards validation against ITK Dev conventions |
+| `itkdev-review-php` | PHP code review checklist (Laravel, Symfony, plain PHP) — security, correctness, performance, PSR-12 |
+| `itkdev-review-python` | Python code review checklist (Django, Flask, FastAPI, scripts) — includes a dedicated security review |
+| `itkdev-review-javascript` | JavaScript/TypeScript code review checklist — security, async error handling, type safety, style |
+| `itkdev-review-comments` | Review and improve inline comments and docblocks (explains "why" not "what") — only touches comments, never code |
 
 ## Agents
 
@@ -29,3 +33,8 @@ claude plugin add itk-dev/itkdev-skills
 |-------|-------------|
 | `itkdev-code-review` | Automated PR review against ITK Dev standards |
 | `itkdev-issue-workflow` | Autonomous GitHub issue workflow (runs in isolated subagent context) |
+
+> **Review skills vs. the review agent:** the `itkdev-review-*` skills are language-specific
+> checklists you can invoke inline on a file or snippet. The `itkdev-code-review` **agent** is the
+> PR-review orchestrator — it gathers PR data, runs process-compliance checks, and delegates
+> language-specific code-quality checks to the matching `itkdev-review-*` skill.

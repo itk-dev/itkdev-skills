@@ -1,5 +1,6 @@
 ---
 name: itkdev-drupal
+user-invocable: true
 description: Drupal development assistance for ITK Dev projects. Use when working with Drupal 10/11 codebases, creating modules/themes, running drush commands, auditing code quality, or managing configuration. Activates for projects with *.info.yml files or web/modules structure.
 ---
 
