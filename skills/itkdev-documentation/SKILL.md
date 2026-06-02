@@ -1,5 +1,6 @@
 ---
 name: itkdev-documentation
+user-invocable: true
 description: Technical documentation and README generation for ITK Dev projects. Use when asked to create, update, or improve documentation, README files, deployment guides, architecture docs, or API documentation. Follows ITK Dev documentation standards with clear structure and procedural content.
 ---
 

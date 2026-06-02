@@ -1,5 +1,6 @@
 ---
 name: itkdev-gh-actions
+user-invocable: true
 description: GitHub Actions workflow templates for ITK Dev projects. Use when setting up or updating GitHub Actions workflows, CI/CD pipelines, asking about available workflow templates, or configuring coding standards checks in CI.
 ---
 

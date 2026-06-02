@@ -1,5 +1,6 @@
 ---
 name: itkdev-adr
+user-invocable: true
 description: Use when creating, updating, or managing Architecture Decision Records (ADRs), documenting architectural decisions, or when discussion reveals a significant technical decision that should be recorded.
 ---
 

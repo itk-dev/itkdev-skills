@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Three per-language code review skills: `itkdev-review-php`, `itkdev-review-python` (with a
+  dedicated security review), and `itkdev-review-javascript`
+- `itkdev-review-comments` skill for reviewing and improving inline comments and docblocks
+  (only touches comments, never code)
+
+### Changed
+
+- `itkdev-code-review` agent now delegates language-specific code-quality checks to the new
+  `itkdev-review-*` skills based on the file types in the diff
+- `itkdev-code-review` agent findings now include concrete suggested fixes, and the agent can hand
+  over its review (post as a GitHub PR review, add inline line comments, or save to a file) via a
+  confirmation-gated next-action menu — analysis stays read-only and nothing is published without
+  explicit user confirmation; the agent never auto-approves a PR
+- All skills are now individually invocable (`user-invocable: true`), so any single skill can be
+  run on its own
+
 ## [0.5.0] - 2026-03-17
 
 ### Added

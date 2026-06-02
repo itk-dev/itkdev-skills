@@ -1,5 +1,6 @@
 ---
 name: itkdev-docker-templates
+user-invocable: true
 description: Project template conventions for ITK Dev Docker projects. Use when setting up new projects, installing or updating Docker templates, comparing project config against templates, scaffolding project structure, or asking about available templates.
 ---
 

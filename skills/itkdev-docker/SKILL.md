@@ -1,5 +1,6 @@
 ---
 name: itkdev-docker
+user-invocable: true
 description: Docker development environment for ITK Dev projects. Use when working with Docker, running containers, debugging Docker issues, setting up local dev, using itkdev-docker-compose commands, Traefik reverse proxy, or server deployments.
 ---
 

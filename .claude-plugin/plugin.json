@@ -17,6 +17,8 @@
     "drupal",
     "symfony",
     "github",
-    "documentation"
+    "documentation",
+    "code-review",
+    "security"
   ]
 }
