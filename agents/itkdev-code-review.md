@@ -212,22 +212,35 @@ do with the review. Use the AskUserQuestion tool. The report-in-chat is always a
 remaining actions are optional and **outward-facing** — never run any of them without an explicit
 confirmation from the user in this step.
 
-Offer these actions (multi-select):
+**State each option's requirements in its description**, so the user knows what's needed before
+choosing — in particular, the two GitHub actions need `gh` authenticated with **write access to
+the repo**. Check write capability first with `gh auth status` (and, if needed,
+`gh api repos/{owner}/{repo} --jq .permissions`). If write access is missing, surface this in the
+menu — mark the GitHub options as unavailable and explain that the user must run
+`gh auth login` / `gh auth refresh -s repo` (or set up a token with `repo` scope) to enable them —
+while still offering the read-only options (save to file, nothing further).
 
-1. **Post as a GitHub PR review** —
+Offer these actions (multi-select). Spell the requirement out in each description:
+
+1. **Post as a GitHub PR review** — *Requires `gh` with write access to the repo.* Publishes a
+   review to the PR and notifies subscribers.
    - `CHANGES REQUESTED` verdict → `gh pr review <n> --request-changes --body-file <report>`
    - `NEEDS ATTENTION` verdict → `gh pr review <n> --comment --body-file <report>`
    - `PASS` verdict → `gh pr review <n> --comment --body-file <report>` (informational)
    - **Never `--approve`.** Approving a PR is a human decision this agent does not make.
-2. **Add inline line comments** — post each `file:line` finding (with its suggested fix) as an
-   inline review comment via `gh api repos/{owner}/{repo}/pulls/<n>/comments`. Skip findings that
-   don't map to a line in the diff and report which were skipped.
-3. **Save the report to a file** — write `review-<n>.md` in the working directory (local artifact,
-   no GitHub side effects).
+2. **Add inline line comments** — *Requires `gh` with write access to the repo.* Posts each
+   `file:line` finding (with its suggested fix) as an inline review comment via
+   `gh api repos/{owner}/{repo}/pulls/<n>/comments`. Skip findings that don't map to a line in the
+   diff and report which were skipped.
+3. **Save the report to a file** — *No GitHub access needed.* Writes `review-<n>.md` in the working
+   directory (local artifact, no GitHub side effects).
 4. **Nothing further** — leave the report in chat only.
 
-Run only the actions the user confirms. After acting, report exactly what was posted/written
-(e.g. the PR review URL, the count of inline comments, the file path).
+Run only the actions the user confirms. If a GitHub action fails despite the pre-check (e.g.
+permission denied, expired token), report the exact error and the remediation
+(`gh auth login` / `gh auth refresh -s repo`) and fall back to offering the report as a saved file.
+After acting, report exactly what was posted/written (e.g. the PR review URL, the count of inline
+comments, the file path).
 
 ## Important Rules
 
