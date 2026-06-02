@@ -7,8 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-06-02
+
 ### Added
 
+- `itkdev-symfony` skill for Symfony development assistance (scaffolding, database configuration,
+  console commands, Symfony configuration)
+- `itkdev-create-project` agent for creating new Drupal/Symfony projects with ITK Dev Docker setup
 - Three per-language code review skills: `itkdev-review-php`, `itkdev-review-python` (with a
   dedicated security review), and `itkdev-review-javascript`
 - `itkdev-review-comments` skill for reviewing and improving inline comments and docblocks
@@ -33,5 +38,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 10 skills: itkdev-docker, itkdev-docker-templates, itkdev-gh-actions, itkdev-taskfile, itkdev-adr, itkdev-documentation, itkdev-drupal, itkdev-github-guidelines, itkdev-issue-workflow, itkdev-validate-standards
 - 2 agents: itkdev-code-review, itkdev-issue-workflow
 
-[Unreleased]: https://github.com/itk-dev/itkdev-skills/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/itk-dev/itkdev-skills/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/itk-dev/itkdev-skills/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/itk-dev/itkdev-skills/releases/tag/v0.5.0
