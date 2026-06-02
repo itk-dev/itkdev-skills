@@ -7,6 +7,7 @@ skills:
   - itkdev-review-php
   - itkdev-review-python
   - itkdev-review-javascript
+  - itkdev-review-comments
 memory: project
 ---
 
@@ -102,6 +103,11 @@ Apply Drupal-specific checks only when a Drupal project is detected.
 - Overly complex functions (excessive nesting, very long functions)
 - Missing error handling for external calls
 - TODO/FIXME/HACK comments introduced in this PR
+
+**Comment quality** — Apply the principles from the `itkdev-review-comments` skill as a checklist
+to *flag* (not fix) comment issues in the diff: comments that restate the code instead of
+explaining the "why", redundant docblocks, and missing context on non-obvious logic. This agent is
+read-only and never edits comments — it only reports findings as Suggestions.
 
 ### Language-Specific Checks (delegated to review skills)
 
