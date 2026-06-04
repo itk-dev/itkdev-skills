@@ -1,0 +1,56 @@
+name: Check plugin version
+
+# Guards against the cache-poisoning bug where a version number is reused for
+# different content. Claude Code keys the plugin cache on the `version` field in
+# .claude-plugin/plugin.json, so every change to plugin content must ship under a
+# new, strictly-greater version. This job fails the PR if that rule is broken.
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out PR branch
+        uses: actions/checkout@v4
+
+      - name: Read PR version
+        id: pr
+        run: |
+          version="$(jq -r '.version' .claude-plugin/plugin.json)"
+          if [ -z "$version" ] || [ "$version" = "null" ]; then
+            echo "::error file=.claude-plugin/plugin.json::Missing \"version\" field"
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "PR version: $version"
+
+      - name: Read main version
+        id: main
+        run: |
+          git fetch --no-tags origin "${{ github.base_ref }}" --depth=1
+          version="$(git show "origin/${{ github.base_ref }}:.claude-plugin/plugin.json" | jq -r '.version')"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "main version: $version"
+
+      - name: Require a strictly-greater version
+        env:
+          PR_VERSION: ${{ steps.pr.outputs.version }}
+          MAIN_VERSION: ${{ steps.main.outputs.version }}
+        run: |
+          # Semver compare: PR_VERSION must be strictly greater than MAIN_VERSION.
+          # `sort -V` orders versions; if the highest is also the lowest, they are equal.
+          if [ "$PR_VERSION" = "$MAIN_VERSION" ]; then
+            echo "::error file=.claude-plugin/plugin.json::Version $PR_VERSION is unchanged from main. Bump the version — a version number must never be reused for different content (it is the plugin cache key)."
+            exit 1
+          fi
+
+          highest="$(printf '%s\n%s\n' "$PR_VERSION" "$MAIN_VERSION" | sort -V | tail -n1)"
+          if [ "$highest" != "$PR_VERSION" ]; then
+            echo "::error file=.claude-plugin/plugin.json::Version $PR_VERSION is lower than main ($MAIN_VERSION). The version must strictly increase."
+            exit 1
+          fi
+
+          echo "OK: $PR_VERSION > $MAIN_VERSION"
