@@ -1,0 +1,21 @@
+{
+  "name": "itkdev-scaffolding-and-templates",
+  "description": "ITK Dev code scaffolding and templates: Docker development environment, project templates, GitHub Actions, Taskfile, and Drupal/Symfony scaffolding",
+  "version": "0.1.0",
+  "author": {
+    "name": "ITK Dev",
+    "email": "itkdev@mkb.aarhus.dk"
+  },
+  "repository": "https://github.com/itk-dev/itkdev-skills",
+  "license": "MIT",
+  "keywords": [
+    "itk-dev",
+    "scaffolding",
+    "templates",
+    "docker",
+    "drupal",
+    "symfony",
+    "taskfile",
+    "github-actions"
+  ]
+}

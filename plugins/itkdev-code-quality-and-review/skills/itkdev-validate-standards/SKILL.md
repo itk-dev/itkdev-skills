@@ -23,6 +23,13 @@ compliance across Docker Compose files, Taskfile, GitHub Actions, PHP
 tooling, and environment configuration is error-prone. This skill
 provides a structured checklist to audit any itk-dev project.
 
+> **NOTE:** The `itkdev-docker`, `itkdev-docker-templates`, `itkdev-taskfile`, and
+> `itkdev-gh-actions` skills referenced throughout this checklist ship in the
+> **`itkdev-scaffolding-and-templates`** plugin. This validation works standalone, but the
+> deeper procedural detail (project detection, template comparison, task/workflow patterns) is
+> only available when that plugin is also installed. Where a referenced skill is missing, fall
+> back to the inline checks and the `itk-dev/devops_itkdev-docker` template repository directly.
+
 ## Context / Trigger Conditions
 
 Use this skill when:

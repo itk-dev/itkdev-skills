@@ -1,0 +1,19 @@
+{
+  "name": "itkdev-business-automation",
+  "description": "ITK Dev business process and team automation: autonomous issue workflow, GitHub guidelines, Architecture Decision Records, and documentation generation",
+  "version": "0.1.0",
+  "author": {
+    "name": "ITK Dev",
+    "email": "itkdev@mkb.aarhus.dk"
+  },
+  "repository": "https://github.com/itk-dev/itkdev-skills",
+  "license": "MIT",
+  "keywords": [
+    "itk-dev",
+    "automation",
+    "workflow",
+    "github",
+    "adr",
+    "documentation"
+  ]
+}

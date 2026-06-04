@@ -1,56 +1,87 @@
-name: Check plugin version
+name: Check plugin versions
 
 # Guards against the cache-poisoning bug where a version number is reused for
-# different content. Claude Code keys the plugin cache on the `version` field in
-# .claude-plugin/plugin.json, so every change to plugin content must ship under a
-# new, strictly-greater version. This job fails the PR if that rule is broken.
+# different content. Claude Code keys each plugin's cache on the `version` field
+# in its .claude-plugin/plugin.json (cache path:
+# ~/.claude/plugins/cache/itkdev-marketplace/<plugin-name>/<version>/), so every
+# change to a plugin's content must ship under a new, strictly-greater version
+# for THAT plugin.
+#
+# This repo hosts multiple plugins under plugins/*/. The check runs per plugin:
+# a plugin whose subtree changed in the PR must bump its version; unchanged
+# plugins are exempt. The job fails the PR if any changed plugin reuses or
+# lowers its version.
 
 on:
   pull_request:
     branches: [main]
 
 jobs:
-  check-version:
+  check-versions:
     runs-on: ubuntu-latest
     steps:
       - name: Check out PR branch
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Read PR version
-        id: pr
-        run: |
-          version="$(jq -r '.version' .claude-plugin/plugin.json)"
-          if [ -z "$version" ] || [ "$version" = "null" ]; then
-            echo "::error file=.claude-plugin/plugin.json::Missing \"version\" field"
-            exit 1
-          fi
-          echo "version=$version" >> "$GITHUB_OUTPUT"
-          echo "PR version: $version"
-
-      - name: Read main version
-        id: main
-        run: |
-          git fetch --no-tags origin "${{ github.base_ref }}" --depth=1
-          version="$(git show "origin/${{ github.base_ref }}:.claude-plugin/plugin.json" | jq -r '.version')"
-          echo "version=$version" >> "$GITHUB_OUTPUT"
-          echo "main version: $version"
-
-      - name: Require a strictly-greater version
+      - name: Check each changed plugin's version
         env:
-          PR_VERSION: ${{ steps.pr.outputs.version }}
-          MAIN_VERSION: ${{ steps.main.outputs.version }}
+          BASE_REF: ${{ github.base_ref }}
         run: |
-          # Semver compare: PR_VERSION must be strictly greater than MAIN_VERSION.
-          # `sort -V` orders versions; if the highest is also the lowest, they are equal.
-          if [ "$PR_VERSION" = "$MAIN_VERSION" ]; then
-            echo "::error file=.claude-plugin/plugin.json::Version $PR_VERSION is unchanged from main. Bump the version — a version number must never be reused for different content (it is the plugin cache key)."
-            exit 1
+          set -euo pipefail
+
+          git fetch --no-tags origin "$BASE_REF" --depth=1
+          base="origin/$BASE_REF"
+
+          failed=0
+          checked=0
+
+          for manifest in plugins/*/.claude-plugin/plugin.json; do
+            [ -e "$manifest" ] || continue
+            plugin_dir="$(dirname "$(dirname "$manifest")")"
+            plugin_name="$(jq -r '.name' "$manifest")"
+
+            pr_version="$(jq -r '.version' "$manifest")"
+            if [ -z "$pr_version" ] || [ "$pr_version" = "null" ]; then
+              echo "::error file=$manifest::Missing \"version\" field"
+              failed=1
+              continue
+            fi
+
+            # Did this plugin's subtree change in the PR (vs. the base branch)?
+            if git diff --quiet "$base" -- "$plugin_dir"; then
+              echo "• $plugin_name: unchanged — skipping ($pr_version)"
+              continue
+            fi
+            checked=$((checked + 1))
+
+            # New plugin: no manifest on the base branch → presence is enough.
+            if ! git cat-file -e "$base:$manifest" 2>/dev/null; then
+              echo "✓ $plugin_name: new plugin at $pr_version"
+              continue
+            fi
+
+            main_version="$(git show "$base:$manifest" | jq -r '.version')"
+
+            if [ "$pr_version" = "$main_version" ]; then
+              echo "::error file=$manifest::$plugin_name changed but its version is still $pr_version. Bump the version — a version number must never be reused for different content (it is the plugin cache key)."
+              failed=1
+              continue
+            fi
+
+            highest="$(printf '%s\n%s\n' "$pr_version" "$main_version" | sort -V | tail -n1)"
+            if [ "$highest" != "$pr_version" ]; then
+              echo "::error file=$manifest::$plugin_name version $pr_version is lower than main ($main_version). The version must strictly increase."
+              failed=1
+              continue
+            fi
+
+            echo "✓ $plugin_name: $pr_version > $main_version"
+          done
+
+          if [ "$checked" -eq 0 ] && [ "$failed" -eq 0 ]; then
+            echo "No plugin content changed — nothing to version-check."
           fi
 
-          highest="$(printf '%s\n%s\n' "$PR_VERSION" "$MAIN_VERSION" | sort -V | tail -n1)"
-          if [ "$highest" != "$PR_VERSION" ]; then
-            echo "::error file=.claude-plugin/plugin.json::Version $PR_VERSION is lower than main ($MAIN_VERSION). The version must strictly increase."
-            exit 1
-          fi
-
-          echo "OK: $PR_VERSION > $MAIN_VERSION"
+          exit "$failed"

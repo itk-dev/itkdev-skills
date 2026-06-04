@@ -2,8 +2,6 @@
 name: itkdev-code-review
 description: "Code review agent for pull requests. Delegates to this agent when reviewing a PR, auditing PR compliance, or checking code quality against ITK Dev standards."
 skills:
-  - itkdev-github-guidelines
-  - itkdev-drupal
   - itkdev-review-php
   - itkdev-review-python
   - itkdev-review-javascript
@@ -43,7 +41,9 @@ gh pr view <number> --json commits --jq '.commits[] | "\(.oid[:7]) \(.messageHea
 
 ## PHASE 3: Process Compliance Review
 
-Check the PR against ITK Dev GitHub guidelines (loaded from `itkdev-github-guidelines` skill):
+Check the PR against ITK Dev GitHub guidelines. If the `itkdev-business-automation` plugin
+is installed, load the `itkdev-github-guidelines` skill for the canonical rules; otherwise apply
+the conventions inlined below (branch naming, Conventional Commits, CHANGELOG, PR description, CI):
 
 ### Branch Naming
 - Must follow: `feature/issue-{number}-{short-description}`
@@ -133,7 +133,8 @@ Warning / Suggestion severities.
 
 ### Drupal-Specific Checks (only when detected)
 
-Apply checks from the `itkdev-drupal` skill:
+If the `itkdev-scaffolding-and-templates` plugin is installed, apply the deeper checks from the
+`itkdev-drupal` skill. Otherwise apply the baseline Drupal checks listed here:
 
 - **Security:** Unescaped user input, missing access checks, raw SQL queries, `\Drupal::` global calls in services
 - **Deprecated APIs:** Usage of APIs deprecated in Drupal 10/11
