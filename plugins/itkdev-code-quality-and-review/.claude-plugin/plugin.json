@@ -1,0 +1,20 @@
+{
+  "name": "itkdev-code-quality-and-review",
+  "description": "ITK Dev code quality and review: code review agent and per-language review skills (PHP, Python, JavaScript), comment review, and standards validation",
+  "version": "0.1.0",
+  "author": {
+    "name": "ITK Dev",
+    "email": "itkdev@mkb.aarhus.dk"
+  },
+  "repository": "https://github.com/itk-dev/itkdev-skills",
+  "license": "MIT",
+  "keywords": [
+    "itk-dev",
+    "code-review",
+    "security",
+    "php",
+    "python",
+    "javascript",
+    "standards"
+  ]
+}

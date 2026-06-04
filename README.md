@@ -2,13 +2,51 @@
 
 ITK Dev team conventions, workflows, and coding standards for Claude Code.
 
-## Install
+This repository hosts **three** Claude Code plugins, distributed through the
+`itkdev-marketplace`. Each plugin is an independent install target, so a team can
+install only the categories it needs. The categories follow the skill *types*
+described in Anthropic's
+[Lessons from building Claude Code: how we use skills](https://claude.com/blog/lessons-from-building-claude-code-how-we-use-skills).
+
+> **Migrating from the old `itkdev-skills` plugin?** It has been split into the
+> three plugins below and is no longer published as a single plugin. Install the
+> ones you need (see each section's install command).
+
+## `itkdev-code-quality-and-review`
+
+*Code quality and review* — the PR review agent and per-language review skills.
 
 ```bash
-claude plugin add itk-dev/itkdev-skills
+/plugin install itkdev-code-quality-and-review@itkdev-marketplace
 ```
 
-## Skills
+| Skill | Description |
+|-------|-------------|
+| `itkdev-review-php` | PHP code review checklist (Laravel, Symfony, plain PHP) — security, correctness, performance, PSR-12 |
+| `itkdev-review-python` | Python code review checklist (Django, Flask, FastAPI, scripts) — includes a dedicated security review |
+| `itkdev-review-javascript` | JavaScript/TypeScript code review checklist — security, async error handling, type safety, style |
+| `itkdev-review-comments` | Review and improve inline comments and docblocks (explains "why" not "what") — only touches comments, never code |
+| `itkdev-validate-standards` | Project standards validation against ITK Dev conventions |
+
+| Agent | Description |
+|-------|-------------|
+| `itkdev-code-review` | Automated PR review against ITK Dev standards |
+
+> **Review skills vs. the review agent:** the `itkdev-review-*` skills are language-specific
+> checklists you can invoke inline on a file or snippet. The `itkdev-code-review` **agent** is the
+> PR-review orchestrator — it gathers PR data, runs process-compliance checks, and delegates
+> language-specific code-quality checks to the matching `itkdev-review-*` skill. For the fullest
+> Drupal and GitHub-guideline coverage it also draws on skills in the
+> `itkdev-scaffolding-and-templates` and `itkdev-business-automation` plugins when those are
+> installed, but it degrades gracefully without them.
+
+## `itkdev-scaffolding-and-templates`
+
+*Code scaffolding and templates* — Docker, project templates, CI, and framework setup.
+
+```bash
+/plugin install itkdev-scaffolding-and-templates@itkdev-marketplace
+```
 
 | Skill | Description |
 |-------|-------------|
@@ -16,27 +54,28 @@ claude plugin add itk-dev/itkdev-skills
 | `itkdev-docker-templates` | Project template conventions (available templates, installation, setup workflows, procedural template operations) |
 | `itkdev-gh-actions` | GitHub Actions workflow templates (general, Drupal, Symfony workflows, configuration files) |
 | `itkdev-taskfile` | Taskfile development workflows (task patterns, coding standards, site management, asset building) |
-| `itkdev-adr` | Architecture Decision Record management |
-| `itkdev-documentation` | Technical documentation and README generation following ITK Dev standards |
 | `itkdev-drupal` | Drupal 10/11 development assistance (code auditing, module/theme development, configuration management) |
-| `itkdev-github-guidelines` | GitHub workflow guidelines (branch naming, commits, changelogs, PRs) |
-| `itkdev-issue-workflow` | Autonomous GitHub issue workflow |
 | `itkdev-symfony` | Symfony development assistance (scaffolding, database configuration, console commands, Symfony configuration) |
-| `itkdev-validate-standards` | Project standards validation against ITK Dev conventions |
-| `itkdev-review-php` | PHP code review checklist (Laravel, Symfony, plain PHP) — security, correctness, performance, PSR-12 |
-| `itkdev-review-python` | Python code review checklist (Django, Flask, FastAPI, scripts) — includes a dedicated security review |
-| `itkdev-review-javascript` | JavaScript/TypeScript code review checklist — security, async error handling, type safety, style |
-| `itkdev-review-comments` | Review and improve inline comments and docblocks (explains "why" not "what") — only touches comments, never code |
-
-## Agents
 
 | Agent | Description |
 |-------|-------------|
-| `itkdev-code-review` | Automated PR review against ITK Dev standards |
 | `itkdev-create-project` | Create new Drupal/Symfony projects with ITK Dev Docker setup |
-| `itkdev-issue-workflow` | Autonomous GitHub issue workflow (runs in isolated subagent context) |
 
-> **Review skills vs. the review agent:** the `itkdev-review-*` skills are language-specific
-> checklists you can invoke inline on a file or snippet. The `itkdev-code-review` **agent** is the
-> PR-review orchestrator — it gathers PR data, runs process-compliance checks, and delegates
-> language-specific code-quality checks to the matching `itkdev-review-*` skill.
+## `itkdev-business-automation`
+
+*Business process and team automation* — issue workflow, GitHub guidelines, ADRs, and documentation.
+
+```bash
+/plugin install itkdev-business-automation@itkdev-marketplace
+```
+
+| Skill | Description |
+|-------|-------------|
+| `itkdev-issue-workflow` | Autonomous GitHub issue workflow |
+| `itkdev-github-guidelines` | GitHub workflow guidelines (branch naming, commits, changelogs, PRs) |
+| `itkdev-adr` | Architecture Decision Record management |
+| `itkdev-documentation` | Technical documentation and README generation following ITK Dev standards |
+
+| Agent | Description |
+|-------|-------------|
+| `itkdev-issue-workflow` | Autonomous GitHub issue workflow (runs in isolated subagent context) |

@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **BREAKING:** The single `itkdev-skills` plugin has been split into three
+  category plugins, each an independent install target with its own version:
+  - `itkdev-code-quality-and-review` (`0.1.0`) — `itkdev-review-php`,
+    `itkdev-review-python`, `itkdev-review-javascript`, `itkdev-review-comments`,
+    `itkdev-validate-standards`, and the `itkdev-code-review` agent.
+  - `itkdev-scaffolding-and-templates` (`0.1.0`) — `itkdev-docker`,
+    `itkdev-docker-templates`, `itkdev-gh-actions`, `itkdev-taskfile`,
+    `itkdev-drupal`, `itkdev-symfony`, and the `itkdev-create-project` agent.
+  - `itkdev-business-automation` (`0.1.0`) — `itkdev-issue-workflow`,
+    `itkdev-github-guidelines`, `itkdev-adr`, `itkdev-documentation`, and the
+    `itkdev-issue-workflow` agent.
+
+  The categories follow the skill *types* in Anthropic's *Lessons from building
+  Claude Code: how we use skills*. The old single `itkdev-skills` plugin entry is
+  removed from `itkdev-marketplace`; existing users must install the new plugins.
+  Skills/agents moved into `plugins/<name>/` subtrees but are otherwise unchanged.
+- Cross-plugin references are now *soft*: the `itkdev-code-review` agent no longer
+  hard-declares `itkdev-github-guidelines` / `itkdev-drupal` (which live in other
+  plugins) in its `skills:` frontmatter, and `itkdev-validate-standards` notes that
+  its referenced Docker/Taskfile/CI skills ship in `itkdev-scaffolding-and-templates`.
+  Both degrade gracefully when the other plugin is not installed. No git-tag-based
+  plugin `dependencies` are used (consistent with the repo's no-tags release rule).
+- `itkdev-documentation` rewritten as thin guidance: the four large templates moved
+  to `references/` (progressive disclosure), duplicated Docker/Taskfile/detection
+  tables replaced with pointers to the relevant skills.
+- `.github/workflows/check-version.yml` now version-checks each plugin in
+  `plugins/*/` independently — a plugin whose subtree changed must bump its own
+  version; unchanged plugins are exempt.
+
 ## [0.7.0] - 2026-06-04
 
 ### Fixed
