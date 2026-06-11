@@ -71,11 +71,7 @@ described in Anthropic's
 
 | Skill | Description |
 |-------|-------------|
-| `itkdev-issue-workflow` | Autonomous GitHub issue workflow |
+| `itkdev-issue-workflow` | How the team works a GitHub issue end to end (developer-driven; Claude assists) |
 | `itkdev-github-guidelines` | GitHub workflow guidelines (branch naming, commits, changelogs, PRs) |
 | `itkdev-adr` | Architecture Decision Record management |
 | `itkdev-documentation` | Technical documentation and README generation following ITK Dev standards |
-
-| Agent | Description |
-|-------|-------------|
-| `itkdev-issue-workflow` | Autonomous GitHub issue workflow (runs in isolated subagent context) |
