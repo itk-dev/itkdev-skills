@@ -1,144 +1,99 @@
 ---
 name: itkdev-issue-workflow
 user-invocable: true
-description: "Autonomous GitHub issue workflow: develop, test, review, merge. Use this skill to work through GitHub issues with minimal user interaction - only pausing when user review/merge is required."
+description: How the ITK Dev team works a GitHub issue from start to finish — understand, branch, implement, test, review, open a PR, and merge. Use when picking up a GitHub issue, asking how we solve issues, or wanting help working an issue in an ITK Dev project. Developer-driven; Claude assists at each step.
 ---
 
-# GitHub Issue Workflow
+# Working a GitHub Issue (ITK Dev)
 
-You are an autonomous developer working through GitHub issues. Work with MINIMAL user interaction - only pause when user review/merge is required.
+This is how the ITK Dev team takes a GitHub issue from "assigned" to "merged".
+The **developer drives** — they make the decisions and set the pace. Claude
+**assists** at each step: gathering context, drafting code, running checks, and
+catching problems. Don't run the whole thing autonomously or merge on the
+developer's behalf.
 
-## PHASE 1: Issue Selection
-1. Run `gh issue list --state open --limit 10` to show open issues
-2. If user provided an issue number, use that. Otherwise, present the list and ask which issue to work on.
-3. Run `gh issue view <number>` to get full details
-4. Briefly summarize the issue and START WORKING IMMEDIATELY - do not ask for confirmation.
+The Git/PR mechanics (branch naming, Conventional Commits, CHANGELOG, PR
+description) live in the `itkdev-github-guidelines` skill — follow it rather than
+restating the rules here.
 
-## PHASE 2: Development (AUTONOMOUS)
-1. Switch to main branch and pull latest: `git checkout main && git pull`
-2. Create feature branch: `git checkout -b feature/issue-<number>-<short-description>`
-3. For non-trivial tasks, use EnterPlanMode to plan implementation
-4. Implement the solution following CLAUDE.md guidelines
-5. Update CHANGELOG.md with the changes
-6. Run CI checks (see "Tool Detection Strategy" section below):
-   
-   **Step A - Detect available tools:**
-   - Run `task` to list available Taskfile tasks (if Taskfile.yml exists)
-   - Run `itkdev-docker-compose composer run --list` to see composer scripts
-   
-   **Step B - Apply coding standards fixes first (auto-fix before checking):**
-   - Preferred: `task coding-standards:apply`
-   - Fallback: `itkdev-docker-compose composer run phpcbf` (if script exists)
-   - Fallback: `itkdev-docker-compose vendor/bin/phpcbf`
-   
-   **Step C - Run full CI checks:**
-   - Preferred: `task ci` (runs all checks)
-   - If `task ci` doesn't exist, run checks individually:
-     - `task ci:coding-standards` or `itkdev-docker-compose vendor/bin/phpcs`
-     - `task ci:phpunit` or `itkdev-docker-compose vendor/bin/phpunit`
-     - `itkdev-docker-compose composer run phpstan` (if available)
-   
-   **Step D - Fix any remaining issues and repeat until all checks pass**
+## 1. Understand the issue
 
-7. Commit changes with descriptive message referencing the issue
-8. Push branch and create PR:
-   ```bash
-   git push -u origin <branch-name>
-   gh pr create --title "Issue #<number>: <short description>" --body "$(cat <<'EOF'
-   ## Summary
-   <Brief description of what was implemented>
-   
-   ## Changes
-   - <List key changes made>
-   
-   ## Testing
-   - <How the changes were tested>
-   
-   Fixes #<issue-number>
-   EOF
-   )"
-   ```
-   Store the PR number for use in Phase 5.
+- `gh issue list --state open --limit 10` to see what's open, or
+  `gh issue view <number>` for a specific one.
+- Read the issue fully. Summarize it back to the developer and confirm the scope
+  and acceptance criteria before writing code — surface anything ambiguous or
+  underspecified now, not after a PR is open.
+- For non-trivial work, plan the implementation first (use plan mode) and check
+  the project's `CLAUDE.md` for project-specific conventions.
 
-## PHASE 3: Automated Testing (AUTONOMOUS)
-Automatically test based on the type of change:
+## 2. Branch and implement
 
-**For UI changes:**
-- Use dev-browser skill to navigate to the affected page
-- Test the specific functionality that was changed
-- Take screenshots if helpful
-- Document any issues found and fix them
+- Start from an up-to-date `main`:
+  `git checkout main && git pull`.
+- Create a feature branch following `itkdev-github-guidelines`
+  (`feature/issue-<number>-<short-description>`). Never commit to `main`.
+- Implement the change. Keep commits focused and use Conventional Commits.
+- Update `CHANGELOG.md` under `[Unreleased]` as part of the work.
 
-**For API/backend changes:**
-- If there's a UI component (like a download button), test it via dev-browser
-- Verify the fix works as expected
+## 3. Test before opening a PR
 
-**For PDF/report changes:**
-- Navigate to a scan results page
-- Click the PDF download button
-- Verify no errors occur
+Use whichever of these fit the change — usually more than one:
 
-**For form/validation changes:**
-- Navigate to the relevant form
-- Test with valid and invalid inputs
+- **Run the project's CI checks.** Most ITK Dev projects expose them through a
+  Taskfile (`task ci`) or composer scripts, run inside Docker. See the
+  `itkdev-taskfile` and `itkdev-docker` skills (in the
+  `itkdev-scaffolding-and-templates` plugin) for the command patterns; the
+  "Detecting the project's checks" section below is a quick fallback when those
+  skills aren't installed. Apply coding-standards auto-fixes first, then run the
+  full suite, and fix anything that fails before continuing.
+- **Verify manually in the running local environment.** Bring the Docker site up
+  and exercise the changed behaviour the way a user would — load the affected
+  page, submit the form, trigger the flow — and confirm it does what the issue
+  asks.
+- **Add or extend automated tests.** When the fix is testable, write or update
+  tests to cover it so the behaviour stays correct. Run them as part of the CI
+  suite above.
 
-Fix any issues found during testing, commit, and push.
+## 4. Self-review
 
-## PHASE 4: Automated Code Review (AUTONOMOUS)
-1. Run Task tool with subagent_type='pr-review-toolkit:code-reviewer'
-2. Run Task tool with subagent_type='pr-review-toolkit:silent-failure-hunter'
-3. If HIGH priority issues are found, fix them automatically
-4. For MEDIUM/LOW issues, use judgment - fix if straightforward, otherwise note them
-5. Push any fixes made
+- Re-read your own diff critically: bugs, edge cases, security, leftover debug
+  code, and whether it actually closes the issue.
+- For a deeper pass, the `itkdev-code-review` agent (in the
+  `itkdev-code-quality-and-review` plugin) reviews a branch/PR against ITK Dev
+  standards and produces a structured report. Use it when available; otherwise
+  review manually. Fix what you find before opening the PR.
 
-## PHASE 5: User Review & Merge (WAIT FOR USER)
-Present a summary to the user:
-- What was implemented
-- What was tested
-- Code review results and any fixes made
-- PR link
+## 5. Open the PR
 
-Then say: "PR is ready for your review and merge. I'll wait for the merge to complete."
+- Push the branch and open a PR. Follow `itkdev-github-guidelines` for the PR
+  description (Summary, the `Fixes #<number>` / `Closes #<number>` reference, and
+  a Test Plan) and the pre-PR checklist (CI green, CHANGELOG updated, branch
+  up to date with `main`).
+- Hand the PR to the developer with a short summary of what changed, how it was
+  tested, and what the self-review found.
 
-Wait for merge using:
+## 6. Merge
+
+Merging is the developer's call (and the team requires at least one approving
+review). Don't merge automatically. Once it's merged, switch back to `main`,
+pull, and you're ready for the next issue.
+
+## Detecting the project's checks
+
+A quick reference for finding what a project exposes, when the `itkdev-taskfile` /
+`itkdev-docker` skills aren't available. All commands run inside the project's
+Docker setup.
+
 ```bash
-while true; do
-  pr_state=$(gh pr view <PR_NUMBER> --json state -q '.state')
-  if [ "$pr_state" = "MERGED" ]; then
-    echo "PR merged!"
-    break
-  fi
-  sleep 10
-done
-```
+# Taskfile tasks (if Taskfile.yml / Taskfile.yaml exists)
+task --list
 
-## PHASE 6: Next Issue (AFTER MERGE)
-1. Switch to main and pull: `git checkout main && git pull`
-2. Check for remaining open issues: `gh issue list --state open --limit 5`
-3. If there are open issues, suggest the next one to tackle:
-   "Merge complete! Here are the remaining open issues:
-   [list issues]
-
-   I suggest we tackle #XX next because [reason]. Should I start working on it?"
-4. If user confirms, immediately start Phase 1 with that issue number.
-
-## Tool Detection Strategy
-
-Before running CI commands, detect what's available in the project:
-
-### 1. Check for Taskfile
-```bash
-if [ -f "Taskfile.yml" ] || [ -f "Taskfile.yaml" ]; then
-  task --list  # Shows available tasks
-fi
-```
-
-### 2. Check composer.json scripts
-```bash
+# Composer scripts
 itkdev-docker-compose composer run --list
 ```
 
-### 3. Common Taskfile task names to look for
+Common Taskfile tasks:
+
 | Task | Purpose |
 |------|---------|
 | `task ci` | Full CI suite (coding standards + tests) |
@@ -150,32 +105,11 @@ itkdev-docker-compose composer run --list
 | `task dev:setup` | Initial project setup |
 | `task dev:reset` | Reset local environment |
 
-### 4. Common composer scripts to look for
-| Script | Purpose |
-|--------|---------|
-| `phpcs` | PHP CodeSniffer - check coding standards |
-| `phpcbf` | PHP Code Beautifier - auto-fix standards |
-| `phpunit` / `test` | Run PHPUnit tests |
-| `phpstan` / `analyze` | Static analysis |
-| `coding-standards` | Combined standards check |
-| `coding-standards:check` | Check only (no fix) |
-| `coding-standards:apply` | Apply/fix standards |
+Direct fallbacks when no task or composer script exists:
 
-### 5. Direct itkdev-docker-compose fallbacks
-When no task or composer script exists, run tools directly:
 ```bash
-itkdev-docker-compose vendor/bin/phpcs      # Coding standards
-itkdev-docker-compose vendor/bin/phpcbf     # Auto-fix standards
+itkdev-docker-compose vendor/bin/phpcbf     # Auto-fix standards (run first)
+itkdev-docker-compose vendor/bin/phpcs      # Coding standards check
 itkdev-docker-compose vendor/bin/phpunit    # PHPUnit tests
 itkdev-docker-compose vendor/bin/phpstan    # Static analysis
 ```
-
-## Important Rules
-- Work AUTONOMOUSLY through phases 1-4 without asking for confirmation
-- Only pause at Phase 5 for user review/merge
-- Always follow CLAUDE.md guidelines
-- Never commit directly to main
-- Always run CI checks before creating PR (use tool detection strategy)
-- Apply coding standards fixes BEFORE running checks (saves time)
-- Fix issues found by automated testing and review without asking
-- Be efficient - don't ask unnecessary questions
