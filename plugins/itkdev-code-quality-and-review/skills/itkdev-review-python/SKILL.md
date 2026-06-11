@@ -1,7 +1,7 @@
 ---
 name: itkdev-review-python
 user-invocable: true
-description: Python code review for ITK Dev projects (Django, Flask, FastAPI, scripts, data pipelines). Use when reviewing, auditing, critiquing, or giving feedback on Python code — including snippets, files, or pull requests. Covers a dedicated security review (injection, broken auth, secrets, weak crypto, insecure deserialization, SSRF, path traversal, misconfiguration) plus correctness, performance, type safety, and PEP 8 style. Triggers for "review my Python", "security review", "what's wrong with this", or when Python code is pasted for feedback.
+description: Python code review for ITK Dev projects (Django, Flask, FastAPI, scripts, data pipelines). Use when reviewing, auditing, critiquing, or giving feedback on Python code — including snippets, files, or pull requests. Covers a dedicated security review (injection, XSS, CSRF, broken auth, secrets, weak crypto, insecure deserialization, SSRF, path traversal, misconfiguration) plus correctness, performance (N+1 queries), type safety, and PEP 8 style. Triggers for "review my Python", "security review", "what's wrong with this", or when Python code is pasted for feedback.
 ---
 
 # Python Code Review
@@ -42,6 +42,13 @@ Work through each category. Skip irrelevant ones and say so briefly.
 - [ ] Sensitive data exposure: hardcoded API keys, passwords, tokens; secrets in logs or errors.
 - [ ] Path traversal: user-controlled file paths without sanitization.
 - [ ] SSRF: user-controlled URLs passed to `requests`/`urllib` without allowlisting.
+- [ ] XSS: `mark_safe()` / `|safe` (Django), autoescape disabled or `Markup()` (Jinja2), HTML
+      built by hand from user input.
+- [ ] CSRF: `@csrf_exempt` without justification (Django); state-changing Flask routes without
+      CSRF protection.
+- [ ] Template injection (SSTI): `render_template_string()` / `jinja2.Template()` on user input.
+- [ ] Weak crypto/randomness: `random` for tokens or secrets (use `secrets`); `md5`/`sha1` for
+      passwords (use framework hashers / `bcrypt` / `scrypt`).
 
 **Correctness**
 
@@ -86,9 +93,11 @@ Work through each category. Skip irrelevant ones and say so briefly.
 - **`global` / `nonlocal` overuse**: sign of poor state design.
 - **`__all__`**: defined if the module is a public API?
 - **Context managers**: `with` used for files, locks, DB sessions, HTTP clients?
+- **HTTP timeouts**: `requests`/`httpx` calls without `timeout=` hang forever.
+- **`assert` for validation**: stripped under `python -O` — use explicit checks that raise.
 - **Django specifics**: raw SQL via `raw()` / `cursor.execute()` vs ORM; `select_related()` /
   `prefetch_related()` for N+1; `@login_required` / permissions on views; no business logic in
-  signals.
+  signals; `mark_safe` / `|safe` and `@csrf_exempt` usages justified?
 - **Flask/FastAPI specifics**: input validation (Pydantic, WTForms, marshmallow); thin route
   handlers (business logic in services); proper HTTP status codes.
 - **Data pipelines / scripts**: large files streamed/chunked rather than loaded fully into memory;
@@ -167,3 +176,6 @@ remediation plan.
 | Subprocess injection | `subprocess.run(f"ls {user_input}", shell=True)` | `subprocess.run(["ls", user_input])` |
 | Insecure deserialization | `pickle.loads(user_data)` | Use JSON, or validate the source |
 | Unsafe YAML | `yaml.load(data)` | `yaml.safe_load(data)` |
+| Weak token | `random.random()` | `secrets.token_urlsafe()` |
+| SSTI | `render_template_string(user_input)` | Render a fixed template, pass data as variables |
+| Missing timeout | `requests.get(url)` | `requests.get(url, timeout=10)` |

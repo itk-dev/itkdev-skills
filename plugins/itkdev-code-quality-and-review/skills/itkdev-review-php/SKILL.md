@@ -1,14 +1,14 @@
 ---
 name: itkdev-review-php
 user-invocable: true
-description: PHP code review for ITK Dev projects (Laravel, Symfony, plain PHP). Use when reviewing, auditing, critiquing, or giving feedback on PHP code — including snippets, files, or pull requests. Covers security (SQL injection, XSS, mass assignment, file inclusion, command injection), correctness, performance (N+1 queries), type safety, and PSR-12 style. Triggers for "review my PHP", "what's wrong with this", "security review", or when PHP code is pasted for feedback.
+description: PHP code review for ITK Dev projects (Symfony, Drupal, Laravel, plain PHP). Use when reviewing, auditing, critiquing, or giving feedback on PHP code — including snippets, files, or pull requests. Covers a dedicated security review (SQL injection, XSS, mass assignment, file inclusion, command injection, weak crypto, insecure deserialization, misconfiguration) plus correctness, performance (N+1 queries), type safety, and PSR-12 style. Triggers for "review my PHP", "security review", "what's wrong with this", or when PHP code is pasted for feedback.
 ---
 
 # PHP Code Review
 
-Produce structured, prioritized code reviews for PHP codebases (Laravel, Symfony, plain PHP).
-Reviews should be developer-friendly: specific, actionable, and ranked so the author knows what
-to fix first.
+Produce structured, prioritized code reviews for PHP codebases (Symfony, Drupal, Laravel, plain
+PHP). Reviews should be developer-friendly: specific, actionable, and ranked so the author knows
+what to fix first.
 
 ## Review Process
 
@@ -16,7 +16,7 @@ to fix first.
 
 Before diving in, identify:
 
-- **Framework**: Laravel, Symfony, or raw PHP.
+- **Framework**: Symfony, Drupal, Laravel, or raw PHP.
 - **Purpose**: Web endpoint? CLI tool? Library? Queue worker?
 - **Scope**: Quick feedback, security focus, full audit, or pre-merge PR review?
 - **Standards**: Apply PSR-12 and any project conventions the user mentions; otherwise use
@@ -87,19 +87,57 @@ Work through each category. Skip irrelevant ones and say so briefly.
 - **`eval()`**: almost always a red flag.
 - **`include`/`require` with variables**: potential file inclusion vulnerability.
 - **`isset()` vs `empty()` vs `??`**: correct null-handling idiom used?
+- **Symfony specifics**:
+  - Services autowired correctly?
+  - Doctrine entities: fetch type appropriate (LAZY vs EAGER)?
+  - Forms: CSRF protection enabled?
+- **Drupal specifics**:
+  - `\Drupal::` static calls inside services? Inject dependencies instead.
+  - Access checks on routes and entity operations (`_permission` requirements, `$entity->access()`)?
+  - Output escaped in render arrays? `t()` placeholders (`@`, `%`, `:`) used instead of string
+    concatenation?
+  - Database API with placeholders — no string-concatenated SQL?
+  - APIs deprecated in Drupal 10/11?
+  - Business logic in hooks (prefer services)?
+  - For deeper Drupal checks, use the `itkdev-drupal` skill (from the
+    `itkdev-scaffolding-and-templates` plugin) when it is installed.
 - **Laravel specifics**:
   - Mass assignment protection (`$fillable` / `$guarded` on models).
   - Policies and Gates used for authorization?
   - Jobs/Queues idempotent? Handle retries?
   - Eloquent N+1: using `with()` for relationships?
   - Config via `config()` in app code (not `env()` outside config files).
-- **Symfony specifics**:
-  - Services autowired correctly?
-  - Doctrine entities: fetch type appropriate (LAZY vs EAGER)?
-  - Forms: CSRF protection enabled?
 - **PSR compliance**: PSR-4 autoloading, PSR-12 code style.
 
-### Step 4 — Format the output
+### Step 4 — Dedicated security review
+
+When the user asks for a **security review** (or a full audit), act as a senior application
+security engineer and cover at minimum these categories:
+
+1. **Injection** — SQL, command, LDAP, template injection.
+2. **Authentication & authorization** — broken auth, missing access controls, insecure sessions.
+3. **Secrets & credentials** — hardcoded keys/passwords/tokens, insecure env-variable usage.
+4. **Cryptography** — weak algorithms, hardcoded salts/IVs, improper key management.
+5. **Input validation** — missing sanitization, type juggling, path traversal, file inclusion.
+6. **Dependency risks** — known-vulnerable Composer packages (flag any worth checking).
+7. **Insecure deserialization** — `unserialize()` on untrusted input, Phar deserialization.
+8. **Error handling & logging** — sensitive data in logs, verbose errors exposed to users.
+9. **Race conditions & TOCTOU** — filesystem or shared-state issues.
+10. **Security misconfigurations** — `display_errors` in production, debug mode on, permissive
+    CORS, weak TLS settings.
+
+For each security finding, provide:
+
+- **Severity**: Critical / High / Medium / Low / Informational
+- **Location**: file and line number(s)
+- **Vulnerability type**: e.g. SQLi, XSS, SSRF, hardcoded secret
+- **Description**: what the issue is and why it's dangerous
+- **Proof of concept**: a brief example of how it could be exploited
+- **Remediation**: a specific code fix or mitigation
+
+After the findings, provide a **prioritized remediation plan** — what to fix first and why.
+
+### Step 5 — Format the output
 
 ```
 ## Code Review: [filename or description]
@@ -123,13 +161,14 @@ One paragraph: what the code does, overall impression, most important theme.
 [2–5 genuine positives]
 ```
 
+For a security-focused review, use the per-finding shape from Step 4 and end with the prioritized
+remediation plan.
+
 ## Tone Guidelines
 
-- **Be direct, not harsh.** "This query is vulnerable to SQL injection — use a prepared statement
-  instead", not "This is terrible code."
+- **Be direct, not harsh.** Explain the fix, don't just condemn the code.
 - **Always explain why**, not just what to change.
-- **Distinguish opinion from fact.** "This *could* be extracted into a helper" vs "This query *is*
-  vulnerable."
+- **Distinguish opinion from fact.** "This *could* be extracted" vs "This *is* vulnerable."
 - **Prioritize ruthlessly.** Group issues that share a root cause.
 - **Acknowledge good work.** "What's Working Well" is not optional filler.
 

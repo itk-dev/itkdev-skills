@@ -90,9 +90,11 @@ Apply Drupal-specific checks only when a Drupal project is detected.
 ### General Checks (all projects)
 
 **Debug code** — Flag any leftover debugging statements:
-- PHP: `var_dump`, `print_r`, `dd()`, `dump()`, `dpm()`, `dsm()`, `kint()`, `error_log`
-- JavaScript/TypeScript: `console.log`, `console.debug`, `console.warn`, `debugger`
+- PHP: `var_dump`, `print_r`, `dd()`, `dump()`, `dpm()`, `dsm()`, `kint()`
+- JavaScript/TypeScript: `console.log`, `console.debug`, `debugger`
 - Twig: `{{ dump() }}`, `{{ kint() }}`
+- `error_log` (PHP) and `console.warn` (JS) only when they are clearly leftover debugging (dumps
+  of local variables, "here" markers) — not deliberate logging
 
 **Hardcoded secrets** — Flag potential secrets or credentials:
 - Hardcoded passwords, API keys, tokens
@@ -121,8 +123,9 @@ the matching `itkdev-review-<lang>` skill. Apply only the skills whose languages
 | `.js`, `.jsx`, `.ts`, `.tsx`, `.mjs`, `.cjs` | `itkdev-review-javascript` |
 
 Each skill provides the prioritized Critical/High/Medium/Low checklist, language-specific deep
-checks, and a security pass for that language — map its findings into this report's Critical /
-Warning / Suggestion severities.
+checks, and a security pass for that language. Map its findings into this report's severities as:
+skill **Critical → Critical**, **High → Warning**, **Medium / Low → Suggestion** (include Low
+findings only when they are genuinely worth the author's time).
 
 **Twig:**
 - Unescaped output (`|raw` filter) without justification

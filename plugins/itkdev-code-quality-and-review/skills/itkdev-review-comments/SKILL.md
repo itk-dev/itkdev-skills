@@ -33,8 +33,11 @@ Use the idiomatic comment syntax for each language:
 |------------|-----------------|----------------------|
 | PHP        | `//`            | `/** */`             |
 | JavaScript | `//`            | `/** */` (JSDoc)     |
+| Python     | `#`             | `"""docstring"""`    |
 | Twig       | `{# #}`         | `{# #}` (multiline) |
 | CSS / SCSS | `/* */`         | `/* */`              |
+| YAML       | `#`             | `#` (no block form)  |
+| Shell      | `#`             | `#` (no block form)  |
 
 For languages not listed, follow the language's standard convention.
 

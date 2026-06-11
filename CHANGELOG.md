@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Dedicated security-review step in `itkdev-review-php` and
+  `itkdev-review-javascript`, mirroring the one `itkdev-review-python` already
+  had: ten language-specific categories, a per-finding format (severity,
+  location, vulnerability type, description, proof of concept, remediation),
+  and a closing prioritized remediation plan. Skill descriptions updated to
+  advertise it.
+- Drupal deep checks in `itkdev-review-php` (`\Drupal::` static calls in
+  services, access checks on routes/entities, render-array escaping and `t()`
+  placeholders, database API placeholders, deprecated Drupal 10/11 APIs,
+  business logic in hooks), with a soft reference to the `itkdev-drupal` skill
+  for deeper checks. Framework list reordered to Symfony, Drupal, Laravel,
+  plain PHP to match how ITK Dev actually works.
+- Python, YAML, and Shell rows in the `itkdev-review-comments` comment-syntax
+  table.
+- Security parity in `itkdev-review-python` itself: XSS (`mark_safe`, Jinja2
+  autoescape), CSRF (`@csrf_exempt`), template injection (SSTI), and
+  weak-randomness/crypto checks in the Critical checklist; HTTP-timeout and
+  `assert`-for-validation deep checks; quick-reference rows for weak tokens,
+  SSTI, and missing timeouts.
+
+### Changed
+
+- The `itkdev-code-review` agent now defines the explicit severity mapping from
+  the review skills' four tiers to the report's three (Critical → Critical,
+  High → Warning, Medium/Low → Suggestion), and only flags `error_log` /
+  `console.warn` as debug code when they are clearly leftover debugging rather
+  than deliberate logging.
+- Tone Guidelines, severity headers, and the output-format template are now
+  word-for-word identical across the three language review skills, so future
+  drift shows up in diffs.
+
 ### Changed
 
 - **BREAKING:** The single `itkdev-skills` plugin has been split into three

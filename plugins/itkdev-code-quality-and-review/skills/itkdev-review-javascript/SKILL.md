@@ -1,7 +1,7 @@
 ---
 name: itkdev-review-javascript
 user-invocable: true
-description: JavaScript/TypeScript code review for ITK Dev projects (browser, Node.js, frontend frameworks). Use when reviewing, auditing, critiquing, or giving feedback on JS/TS code — including snippets, files, or pull requests. Covers security (XSS, prototype pollution, eval, injection), correctness, async/promise error handling, type safety (any usage), and style (var vs const/let). Triggers for "review my JS/TS", "what's wrong with this", "security review", or when JavaScript/TypeScript code is pasted for feedback.
+description: JavaScript/TypeScript code review for ITK Dev projects (browser, Node.js, frontend frameworks). Use when reviewing, auditing, critiquing, or giving feedback on JS/TS code — including snippets, files, or pull requests. Covers a dedicated security review (XSS, prototype pollution, eval, injection, secrets in bundles, SSRF, supply chain, misconfiguration) plus correctness, async/promise error handling, type safety (any usage), and style (var vs const/let). Triggers for "review my JS/TS", "security review", "what's wrong with this", or when JavaScript/TypeScript code is pasted for feedback.
 ---
 
 # JavaScript / TypeScript Code Review
@@ -91,7 +91,42 @@ Work through each category. Skip irrelevant ones and say so briefly.
 - **`innerHTML` and friends**: justified and sanitized?
 - **Dependency risks**: known-vulnerable packages; flag any imports worth checking.
 
-### Step 4 — Format the output
+### Step 4 — Dedicated security review
+
+When the user asks for a **security review** (or a full audit), act as a senior application
+security engineer and cover at minimum these categories:
+
+1. **XSS sinks** — `innerHTML`, `dangerouslySetInnerHTML`, `document.write`, unescaped
+   server-rendered output.
+2. **Prototype pollution** — untrusted objects merged into `__proto__` / `constructor` / shared
+   objects.
+3. **Dynamic code execution** — `eval()`, `new Function()`, string arguments to
+   `setTimeout`/`setInterval`.
+4. **Injection** — shell commands, SQL, or templates built from user input (Node.js).
+5. **Secrets & credentials** — keys/tokens hardcoded or shipped in client bundles, insecure
+   env-variable usage.
+6. **Origin handling** — `postMessage` without origin checks, permissive CORS, unsafe
+   `window.open` targets.
+7. **SSRF (Node.js)** — user-controlled URLs passed to `fetch`/`http` without allowlisting.
+8. **Dependency & supply-chain risks** — known-vulnerable packages, typosquats, install scripts
+   worth checking.
+9. **Cryptography** — `Math.random()` for tokens/IDs, homegrown crypto instead of Web Crypto /
+   `node:crypto`.
+10. **Security misconfigurations** — missing CSP, cookies without `HttpOnly`/`Secure`/`SameSite`,
+    debug endpoints exposed.
+
+For each security finding, provide:
+
+- **Severity**: Critical / High / Medium / Low / Informational
+- **Location**: file and line number(s)
+- **Vulnerability type**: e.g. SQLi, XSS, SSRF, hardcoded secret
+- **Description**: what the issue is and why it's dangerous
+- **Proof of concept**: a brief example of how it could be exploited
+- **Remediation**: a specific code fix or mitigation
+
+After the findings, provide a **prioritized remediation plan** — what to fix first and why.
+
+### Step 5 — Format the output
 
 ```
 ## Code Review: [filename or description]
@@ -115,11 +150,14 @@ One paragraph: what the code does, overall impression, most important theme.
 [2–5 genuine positives]
 ```
 
+For a security-focused review, use the per-finding shape from Step 4 and end with the prioritized
+remediation plan.
+
 ## Tone Guidelines
 
 - **Be direct, not harsh.** Explain the fix, don't just condemn the code.
 - **Always explain why**, not just what to change.
-- **Distinguish opinion from fact.** "This *could* be memoized" vs "This *is* an XSS sink."
+- **Distinguish opinion from fact.** "This *could* be extracted" vs "This *is* vulnerable."
 - **Prioritize ruthlessly.** Group issues that share a root cause.
 - **Acknowledge good work.** "What's Working Well" is not optional filler.
 
