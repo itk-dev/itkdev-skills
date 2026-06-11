@@ -9,19 +9,14 @@ description: |
   Walks through 9 validation areas: template comparison, docker-compose,
   server compose, environment, Taskfile, framework-specific config, Composer,
   GitHub Actions, and miscellaneous files.
-author: Claude Code
-version: 1.0.0
 ---
 
 # Validate itk-dev Standards
 
-## Problem
-
-itk-dev projects must follow conventions from the
-`itk-dev/devops_itkdev-docker` template repository. Manually checking
-compliance across Docker Compose files, Taskfile, GitHub Actions, PHP
-tooling, and environment configuration is error-prone. This skill
-provides a structured checklist to audit any itk-dev project.
+itk-dev projects must follow the conventions from the
+`itk-dev/devops_itkdev-docker` template repository. Checking compliance by hand
+across Docker Compose, Taskfile, GitHub Actions, PHP tooling, and environment
+config is error-prone — this skill is a structured checklist to audit a project.
 
 > **NOTE:** The `itkdev-docker`, `itkdev-docker-templates`, `itkdev-taskfile`, and
 > `itkdev-gh-actions` skills referenced throughout this checklist ship in the
@@ -29,15 +24,6 @@ provides a structured checklist to audit any itk-dev project.
 > deeper procedural detail (project detection, template comparison, task/workflow patterns) is
 > only available when that plugin is also installed. Where a referenced skill is missing, fall
 > back to the inline checks and the `itk-dev/devops_itkdev-docker` template repository directly.
-
-## Context / Trigger Conditions
-
-Use this skill when:
-- Auditing a project for itk-dev convention compliance
-- Reviewing a PR that changes Docker, Taskfile, or CI configuration
-- Setting up a new itk-dev project
-- Upgrading from older itk-dev Docker conventions
-- User asks to "check itk-dev standards" or "validate Docker setup"
 
 ## Solution
 

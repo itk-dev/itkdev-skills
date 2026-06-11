@@ -1,7 +1,7 @@
 ---
 name: itkdev-review-comments
-description: Review and improve inline code comments following ITK Dev conventions. Explains "why" not "what", keeps comments short and focused, removes redundant comments. Use when asked to review comments, clean up comments, or improve code documentation. ONLY modifies comments and docblocks — never changes code.
 user-invocable: true
+description: Review and improve inline code comments following ITK Dev conventions. Explains "why" not "what", keeps comments short and focused, removes redundant comments. Use when asked to review comments, clean up comments, or improve code documentation. ONLY modifies comments and docblocks — never changes code.
 ---
 
 # Code Comments Review

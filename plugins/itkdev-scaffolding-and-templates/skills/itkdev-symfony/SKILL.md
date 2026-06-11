@@ -1,5 +1,6 @@
 ---
 name: itkdev-symfony
+user-invocable: true
 description: Symfony development assistance for ITK Dev projects. Use when working with Symfony codebases, scaffolding Symfony projects, configuring databases, running console commands, or managing Symfony configuration.
 ---
 

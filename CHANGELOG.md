@@ -11,15 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **BREAKING:** The single `itkdev-skills` plugin has been split into three
   category plugins, each an independent install target with its own version:
-  - `itkdev-code-quality-and-review` (`0.1.0`) — `itkdev-review-php`,
+  - `itkdev-code-quality-and-review` (`0.1.1`) — `itkdev-review-php`,
     `itkdev-review-python`, `itkdev-review-javascript`, `itkdev-review-comments`,
     `itkdev-validate-standards`, and the `itkdev-code-review` agent.
-  - `itkdev-scaffolding-and-templates` (`0.1.0`) — `itkdev-docker`,
+  - `itkdev-scaffolding-and-templates` (`0.1.1`) — `itkdev-docker`,
     `itkdev-docker-templates`, `itkdev-gh-actions`, `itkdev-taskfile`,
     `itkdev-drupal`, `itkdev-symfony`, and the `itkdev-create-project` agent.
-  - `itkdev-business-automation` (`0.1.0`) — `itkdev-issue-workflow`,
-    `itkdev-github-guidelines`, `itkdev-adr`, `itkdev-documentation`, and the
-    `itkdev-issue-workflow` agent.
+  - `itkdev-business-automation` (`0.2.0`) — `itkdev-issue-workflow`,
+    `itkdev-github-guidelines`, `itkdev-adr`, and `itkdev-documentation`.
 
   The categories follow the skill *types* in Anthropic's *Lessons from building
   Claude Code: how we use skills*. The old single `itkdev-skills` plugin entry is
@@ -37,6 +36,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `.github/workflows/check-version.yml` now version-checks each plugin in
   `plugins/*/` independently — a plugin whose subtree changed must bump its own
   version; unchanged plugins are exempt.
+- **`itkdev-business-automation` (`0.2.0`):** `itkdev-issue-workflow` skill reworked
+  from an autonomous "phases 1–4" automation script into a developer-driven guide
+  for how the team works a GitHub issue (Claude assists; the developer drives and
+  decides when to merge). Removed references to the non-existent `dev-browser` skill
+  and `pr-review-toolkit:*` subagents; testing guidance now covers project CI tasks,
+  manual local verification, and writing/extending tests, and review points at the
+  real `itkdev-code-review` agent. Git/PR mechanics now soft-reference
+  `itkdev-github-guidelines` instead of restating them.
+- **`itkdev-code-quality-and-review` (`0.1.1`):** `itkdev-validate-standards`
+  frontmatter normalized (dropped the non-standard `author`/`version` fields) and the
+  duplicated Problem/Trigger-Conditions preamble collapsed into a short intro, keeping
+  the body under the 500-line guideline. No validation checks removed.
+- **`itkdev-scaffolding-and-templates` (`0.1.1`):** `itkdev-symfony` now declares
+  `user-invocable: true` to match every other skill. Frontmatter key order normalized
+  on `itkdev-symfony` and `itkdev-review-comments` (`name → user-invocable →
+  description`).
+
+### Removed
+
+- **`itkdev-business-automation` (`0.2.0`):** removed the autonomous
+  `itkdev-issue-workflow` agent. The reworked, developer-driven
+  `itkdev-issue-workflow` skill is now the single source for how the team solves
+  issues.
 
 ## [0.7.0] - 2026-06-04
 
