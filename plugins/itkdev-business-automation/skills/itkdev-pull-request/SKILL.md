@@ -1,13 +1,12 @@
 ---
-name: pr-description
+name: itkdev-pull-request
 description: Generate a pull request description respecting the repository's PR template if one exists.
 ---
 
 # PR Description Generator
 
 Generate a high-quality pull request description based on the actual changes in the branch, formatted
-according to the repository's PR template when one exists. The final deliverable is a ready-to-use
-`gh pr create` command that the user runs themselves — never create the PR on the user's behalf.
+according to the repository's PR template when one exists.
 
 ## Workflow
 
