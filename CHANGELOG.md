@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Documentation
+
+- Documented the skill naming convention in `CLAUDE.md`: every skill is
+  prefixed `itkdev-` and its `name:` field must match its directory name
+  exactly. Added a reminder to list each new skill in `README.md`.
+- Added the `itkdev-pr` skill row to the `itkdev-business-automation` table in
+  `README.md`.
+
 ### Changed
 
 - **BREAKING:** The single `itkdev-skills` plugin has been split into three

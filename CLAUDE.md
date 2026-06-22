@@ -12,6 +12,25 @@ The marketplace points each plugin at its subdirectory with a `git-subdir`
 source; it pins no tag, branch, or commit. The categories follow the skill
 *types* in Anthropic's *Lessons from building Claude Code: how we use skills*.
 
+## Skill conventions
+
+### Naming
+
+Every skill is namespaced with the `itkdev-` prefix, and its `name:` field
+**must match its directory name exactly**. The prefix is what users type to
+invoke the skill (`/itkdev-...`) and what keeps our skills grouped and
+discoverable among the rest of a user's installed plugins.
+
+- Directory: `plugins/<plugin>/skills/itkdev-<slug>/`
+- `SKILL.md` frontmatter: `name: itkdev-<slug>` (identical to the directory)
+
+Examples: `itkdev-adr`, `itkdev-review-php`, `itkdev-docker`, `itkdev-pr`. Never
+ship an un-prefixed name (e.g. `pr-description`) or a `name:` that differs from
+the directory — both break invocation and convention.
+
+When you add a skill, also add a row for it to the matching plugin's table in
+`README.md`.
+
 ## Versioning and releasing
 
 ### The one rule

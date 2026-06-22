@@ -75,3 +75,4 @@ described in Anthropic's
 | `itkdev-github-guidelines` | GitHub workflow guidelines (branch naming, commits, changelogs, PRs) |
 | `itkdev-adr` | Architecture Decision Record management |
 | `itkdev-documentation` | Technical documentation and README generation following ITK Dev standards |
+| `itkdev-pr` | Generate a pull request description from the branch diff, respecting the repository's PR template if one exists |
