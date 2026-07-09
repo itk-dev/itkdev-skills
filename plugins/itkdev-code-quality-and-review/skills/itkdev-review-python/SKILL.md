@@ -19,12 +19,42 @@ Before diving in, identify:
 - **Framework**: Django, Flask, FastAPI, plain script, or data pipeline.
 - **Purpose**: Web endpoint? CLI tool? Library? Batch job?
 - **Scope**: Quick feedback, security focus, full audit, or pre-merge PR review?
-- **Standards**: Apply PEP 8 and any project conventions the user mentions; otherwise use
-  community defaults.
+- **Standards**: Apply [PEP 8](https://peps.python.org/pep-0008/) (style),
+  [PEP 257](https://peps.python.org/pep-0257/) (docstrings), and
+  [PEP 484](https://peps.python.org/pep-0484/) (type hints), plus any project conventions the user
+  mentions; otherwise use community defaults.
+- **Tooling**: does the repo configure a linter/formatter? Look for `ruff`, `flake8`, `black`,
+  `isort`, `mypy` in `pyproject.toml`, `ruff.toml`, `setup.cfg`, `.flake8`, or `.pre-commit-config.yaml`.
+  This decides how much mechanical style you check by hand (see Step 2).
 
 If the user hasn't shared the code yet, ask for it.
 
-### Step 2 — Run the review checklist
+### Step 2 — Run the tooling first (deterministic style)
+
+Mechanical PEP 8 — line length, import order, whitespace, blank lines, quote style, trailing
+commas — is **owned by tooling, not by you**. Linters catch it perfectly and instantly; hand-eyeballing
+it is slower, inconsistent, and erodes trust when you miss one or invent one. So:
+
+- **If the repo configures a linter/formatter** (found in Step 1), run it — or, when you can't execute
+  commands, tell the author the exact command — and treat its output as ground truth for mechanical
+  style:
+  - `ruff check .` — lint (import order, unused names, many PEP 8 rules)
+  - `ruff format --check .` (or `black --check .`) — formatting
+  - `isort --check-only .` — import ordering (if not already handled by ruff)
+  - `mypy .` (or `pyright`) — type checking
+  Fold the findings into the report; **do not** re-report by hand what the tool already flags.
+- **Respect the formatter.** When the project uses `black` / `ruff format`, do **not** raise findings
+  the formatter owns — line length (88 by default), quote style, blank-line counts, trailing commas.
+  The formatter is the authority; fighting it is noise. Flagging line length in a black-formatted repo
+  is a bug in the review, not a finding.
+- **If no linter is configured**, apply PEP 8 by hand using `references/pep8-checklist.md`, and
+  **recommend adopting `ruff`** as a High-priority finding — a one-time `pyproject.toml` config beats
+  every future manual style review.
+
+Either way, spend your own judgment on the style questions tools *can't* decide — see the "Style &
+Pythonic idioms" checks below and the reference file.
+
+### Step 3 — Run the review checklist
 
 Work through each category. Skip irrelevant ones and say so briefly.
 
@@ -66,20 +96,27 @@ Work through each category. Skip irrelevant ones and say so briefly.
 
 - **Code quality**: functions doing more than one thing; functions longer than ~40–50 lines without
   good reason; deep nesting (>3–4 levels); magic numbers/strings; duplicate code; dead code.
-- **Naming**: misleading names; obscure abbreviations; not following PEP 8 (snake_case
-  functions/vars, PascalCase classes).
+- **Naming** (judgment — linters can't check *semantics*): misleading or inaccurate names; obscure
+  abbreviations; single-letter names outside short loops; wrong PEP 8 *case convention* for the kind
+  of name (`snake_case` functions/vars, `PascalCase` classes, `UPPER_SNAKE` constants, `_leading`
+  for non-public, avoiding `l`/`O`/`I` as single chars).
 - **Docstrings & comments**: missing docstrings on public functions/classes (especially complex
   ones); comments describing *what* rather than *why*; outdated comments contradicting the code.
 
 #### 🟢 Low / Suggestions (nice to have)
 
-- **Style**: PEP 8 violations (line length, import order, blank lines); inconsistent style.
+- **Style & Pythonic idioms** (only what tools *don't* own — mechanical PEP 8 is Step 2): a long line
+  that should wrap at a *semantic* boundary rather than where the formatter broke it; `l`/`O`/`I`
+  ambiguous names; `== None` instead of `is None`; `type(x) == T` instead of `isinstance`; unpythonic
+  loops (`range(len(...))`, manual index tracking) where a comprehension/`enumerate`/`zip` reads
+  better; over-dense comprehensions that should be a loop; string concatenation in a loop. See
+  `references/pep8-checklist.md`. If the repo has no linter, this is where "adopt `ruff`" belongs.
 - **Design**: opportunities to apply a pattern more clearly; tight coupling that could be injected;
   testability improvements (hard-coded dependencies, global state).
 - **Testing**: missing unit/integration tests for critical paths; tests without assertions; no test
   for edge cases identified in this review.
 
-### Step 3 — Python-specific deep checks
+### Step 4 — Python-specific deep checks
 
 - **`eval()` / `exec()`**: almost always a red flag.
 - **Mutable default arguments**: `def f(x=[]):` is a classic gotcha.
@@ -95,7 +132,7 @@ Work through each category. Skip irrelevant ones and say so briefly.
   pandas `apply()` over vectorized ops is slow — flag it; logging configured (not `print()`) for
   long-running scripts.
 
-### Step 4 — Dedicated security review
+### Step 5 — Dedicated security review
 
 When the user asks for a **security review** (or a full audit), act as a senior application
 security engineer and cover at minimum these categories:
@@ -122,13 +159,17 @@ For each security finding, provide:
 
 After the findings, provide a **prioritized remediation plan** — what to fix first and why.
 
-### Step 5 — Format the output
+### Step 6 — Format the output
 
 ```
 ## Code Review: [filename or description]
 
 ### Summary
 One paragraph: what the code does, overall impression, most important theme.
+
+### 🧰 Tooling
+Which linter/formatter/type-checker was run (or the command the author should run), and a one-line
+digest of its output. "No linter configured — recommend adopting ruff (see High)." if none.
 
 ### 🔴 Critical Issues
 [numbered list, each with: location, problem, why it matters, concrete fix]
@@ -146,7 +187,7 @@ One paragraph: what the code does, overall impression, most important theme.
 [2–5 genuine positives]
 ```
 
-For a security-focused review, use the per-finding shape from Step 4 and end with the prioritized
+For a security-focused review, use the per-finding shape from Step 5 and end with the prioritized
 remediation plan.
 
 ## Tone Guidelines
