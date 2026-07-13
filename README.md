@@ -76,3 +76,23 @@ described in Anthropic's
 | `itkdev-adr` | Architecture Decision Record management |
 | `itkdev-documentation` | Technical documentation and README generation following ITK Dev standards |
 | `itkdev-pr` | Generate a pull request description from the branch diff, respecting the repository's PR template if one exists |
+
+## `itkdev-obsidian`
+
+*Obsidian knowledge base* — bootstrap a project vault and keep notes, docs, and diagrams in it with the normal file tools.
+
+```bash
+/plugin install itkdev-obsidian@itkdev-marketplace
+```
+
+| Skill | Description |
+|-------|-------------|
+| `itkdev-obsidian-vault` | Read, create, edit, search, move, and tag notes in the project's vault using the normal file tools (vault path resolved from `CLAUDE.md`) |
+| `itkdev-obsidian-markdown` | Author Obsidian Flavored Markdown — wikilinks, embeds, callouts, properties, tags, Mermaid, LaTeX, footnotes, block references |
+| `itkdev-obsidian-canvas` | Create and edit JSON Canvas (`.canvas`) files — nodes (text, file, link, group) and edges for Obsidian Canvas diagrams |
+
+| Command | Description |
+|---------|-------------|
+| `/itkdev-obsidian:init` | Bootstrap a project to use an Obsidian vault (create/adopt a vault, seed a home note, wire it into `CLAUDE.md` + a project memory) |
+| `/itkdev-obsidian:analyse` | Analyse a folder and capture the findings as notes in the vault (`quick`/`deep` depth) |
+| `/itkdev-obsidian:sync` | Re-check each vault note against the current repo and update stale facts |
