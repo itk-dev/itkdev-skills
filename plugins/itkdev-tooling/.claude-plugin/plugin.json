@@ -1,6 +1,6 @@
 {
-  "name": "itkdev-obsidian",
-  "description": "ITK Dev Obsidian knowledge base: bootstrap a project vault, capture and maintain notes, author Obsidian Flavored Markdown, and build JSON Canvas diagrams — all with the normal file tools",
+  "name": "itkdev-tooling",
+  "description": "ITK Dev tooling",
   "version": "0.1.0",
   "author": {
     "name": "ITK Dev",
@@ -14,6 +14,7 @@
     "notes",
     "documentation",
     "knowledge-base",
-    "canvas"
+    "canvas",
+    "tooling"
   ]
 }

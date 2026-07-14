@@ -77,12 +77,12 @@ described in Anthropic's
 | `itkdev-documentation` | Technical documentation and README generation following ITK Dev standards |
 | `itkdev-pr` | Generate a pull request description from the branch diff, respecting the repository's PR template if one exists |
 
-## `itkdev-obsidian`
+## `itkdev-tooling`
 
-*Obsidian knowledge base* — bootstrap a project vault and keep notes, docs, and diagrams in it with the normal file tools.
+*ITK Dev tooling* — an Obsidian knowledge base: bootstrap a project vault and keep notes, docs, and diagrams in it with the normal file tools.
 
 ```bash
-/plugin install itkdev-obsidian@itkdev-marketplace
+/plugin install itkdev-tooling@itkdev-marketplace
 ```
 
 | Skill | Description |
@@ -93,6 +93,6 @@ described in Anthropic's
 
 | Command | Description |
 |---------|-------------|
-| `/itkdev-obsidian:init` | Bootstrap a project to use an Obsidian vault (create/adopt a vault, seed a home note, wire it into `CLAUDE.md` + a project memory) |
-| `/itkdev-obsidian:analyse` | Analyse a folder and capture the findings as notes in the vault (`quick`/`deep` depth) |
-| `/itkdev-obsidian:sync` | Re-check each vault note against the current repo and update stale facts |
+| `/itkdev-tooling:itkdev-obsidian-init` | Bootstrap a project to use an Obsidian vault (create/adopt a vault, seed a home note, wire it into `CLAUDE.md` + a project memory) |
+| `/itkdev-tooling:itkdev-obsidian-analyse` | Analyse a folder and capture the findings as notes in the vault (`quick`/`deep` depth) |
+| `/itkdev-tooling:itkdev-obsidian-sync` | Re-check each vault note against the current repo and update stale facts |
