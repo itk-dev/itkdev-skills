@@ -1,0 +1,19 @@
+{
+  "name": "itkdev-obsidian",
+  "description": "ITK Dev Obsidian knowledge base: bootstrap a project vault, capture and maintain notes, author Obsidian Flavored Markdown, and build JSON Canvas diagrams — all with the normal file tools",
+  "version": "0.1.0",
+  "author": {
+    "name": "ITK Dev",
+    "email": "itkdev@mkb.aarhus.dk"
+  },
+  "repository": "https://github.com/itk-dev/itkdev-skills",
+  "license": "MIT",
+  "keywords": [
+    "itk-dev",
+    "obsidian",
+    "notes",
+    "documentation",
+    "knowledge-base",
+    "canvas"
+  ]
+}

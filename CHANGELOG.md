@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- New **`itkdev-obsidian`** plugin (`0.1.0`) — an Obsidian knowledge base for
+  projects. Skills: `itkdev-obsidian-vault` (work notes with the normal file
+  tools; vault path resolved from `CLAUDE.md`), `itkdev-obsidian-markdown`
+  (Obsidian Flavored Markdown), and `itkdev-obsidian-canvas` (JSON Canvas
+  `.canvas` files). Commands: `/itkdev-obsidian:init` (bootstrap/adopt a vault
+  and wire it into `CLAUDE.md` + a project memory), `/itkdev-obsidian:analyse`,
+  and `/itkdev-obsidian:sync`. Ported from a personal project's `.claude/`
+  skills and generalized to be project-agnostic (no hardcoded vault path). Still
+  needs registering in the `itkdev-marketplace` (separate
+  `itk-dev/itkdev-claude-plugins` repo) before it can be installed.
+
 ### Documentation
 
 - Documented the skill naming convention in `CLAUDE.md`: every skill is
