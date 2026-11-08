@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- New **`itkdev-infrastructure-operations`** plugin (`0.1.0`) for routine
+  maintenance of projects. Skill: `itkdev-dependency-updates` — the ITK Dev update
+  procedure for a fast CVE/advisory update ("skal gå stærkt") and for the
+  quarterly maintenance update (cybersikkerhedsaftale). The source is the
+  "Opdateringer" page in `itk-dev/documentation`. The plugin must also be
+  registered in the `itkdev-marketplace` (`itk-dev/itkdev-claude-plugins`)
+  before it can be installed.
 - New **`itkdev-tooling`** plugin (`0.1.0`) — an Obsidian knowledge base for
   projects. Skills: `itkdev-obsidian-vault` (work notes with the normal file
   tools; vault path resolved from `CLAUDE.md`), `itkdev-obsidian-markdown`

@@ -1,12 +1,14 @@
 # itkdev-skills — project conventions
 
-This repository hosts **three Claude Code plugins**, each in its own
+This repository hosts **five Claude Code plugins**, each in its own
 `plugins/<name>/` subtree, distributed through the `itkdev-marketplace` (defined
 in `itk-dev/itkdev-claude-plugins`):
 
 - `plugins/itkdev-code-quality-and-review`
 - `plugins/itkdev-scaffolding-and-templates`
 - `plugins/itkdev-business-automation`
+- `plugins/itkdev-tooling`
+- `plugins/itkdev-infrastructure-operations`
 
 The marketplace points each plugin at its subdirectory with a `git-subdir`
 source; it pins no tag, branch, or commit. The categories follow the skill
