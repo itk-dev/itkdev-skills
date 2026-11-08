@@ -2,7 +2,7 @@
 
 ITK Dev team conventions, workflows, and coding standards for Claude Code.
 
-This repository hosts **three** Claude Code plugins, distributed through the
+This repository hosts **five** Claude Code plugins, distributed through the
 `itkdev-marketplace`. Each plugin is an independent install target, so a team can
 install only the categories it needs. The categories follow the skill *types*
 described in Anthropic's
@@ -96,3 +96,15 @@ described in Anthropic's
 | `/itkdev-tooling:itkdev-obsidian-init` | Bootstrap a project to use an Obsidian vault (create/adopt a vault, seed a home note, wire it into `CLAUDE.md` + a project memory) |
 | `/itkdev-tooling:itkdev-obsidian-analyse` | Analyse a folder and capture the findings as notes in the vault (`quick`/`deep` depth) |
 | `/itkdev-tooling:itkdev-obsidian-sync` | Re-check each vault note against the current repo and update stale facts |
+
+## `itkdev-infrastructure-operations`
+
+*Infrastructure operations* — routine maintenance of projects: dependency and security updates.
+
+```bash
+/plugin install itkdev-infrastructure-operations@itkdev-marketplace
+```
+
+| Skill | Description |
+|-------|-------------|
+| `itkdev-dependency-updates` | Update a project's dependencies: a fast CVE/advisory update of only the affected packages, or the quarterly maintenance update (cybersikkerhedsaftale) of templates, images, PHP and all dependencies |
