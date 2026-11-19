@@ -12,8 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - New **`itkdev-infrastructure-operations`** plugin (`0.1.0`) for routine
   maintenance of projects. Skill: `itkdev-dependency-updates` — the ITK Dev update
   procedure for a fast CVE/advisory update ("skal gå stærkt") and for the
-  quarterly maintenance update (cybersikkerhedsaftale). The source is the
-  "Opdateringer" page in `itk-dev/documentation`. The plugin must also be
+  quarterly maintenance update (cybersikkerhedsaftale). The sources are the
+  "Opdateringer" page and the "Composer" section of the PHP page in
+  `itk-dev/documentation`. The plugin must also be
   registered in the `itkdev-marketplace` (`itk-dev/itkdev-claude-plugins`)
   before it can be installed.
 - New **`itkdev-tooling`** plugin (`0.1.0`) — an Obsidian knowledge base for

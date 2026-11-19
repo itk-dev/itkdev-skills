@@ -7,7 +7,10 @@ description: Update the dependencies of an ITK Dev project. Two scenarios - a fa
 
 This skill is the ITK Dev update procedure. The source is the page
 [Opdateringer](https://github.com/itk-dev/documentation/blob/main/docs/teamwork/how_we_work/Opdateringer.md)
-in the documentation repo. If the page and this skill do not agree, the page is correct.
+in the documentation repo. The Composer rules (direct dependencies, security advisories, abandoned packages and
+the cooldown) are in the section "Composer" of the page
+[PHP](https://github.com/itk-dev/documentation/blob/main/docs/web/php/php.md#composer). If the pages and this
+skill do not agree, the pages are correct.
 
 ## Step 1: Choose the scenario
 
@@ -42,6 +45,50 @@ before we install it.
 - Do not change the cooldown in project files. To change it for one command, use
   `docker compose exec -e 'COMPOSER_POLICY_COOLDOWN_PERIOD=24 hours' phpfpm composer ...`.
 
+### Composer audit
+
+After an update, `composer audit` must report no advisories. This applies to both scenarios.
+
+- Update the package to a fixed version. This is the default.
+- If an update is not possible, ignore the advisory in `composer.json` with a valid reason. Tell the user the
+  reason, and get their approval before you add it:
+
+  ```json
+  {
+      "config": {
+          "policy": {
+              "advisories": {
+                  "ignore-id": {
+                      "CVE-2026-12345": "Only affects the X component, which we don't use. Reviewed 2026-11-18."
+                  }
+              }
+          }
+      }
+  }
+  ```
+
+- Always ignore by ID (`policy.advisories.ignore-id`), not by package name (`policy.advisories.ignore`). Then a
+  new advisory on the same package still fails the audit.
+- `config.audit` is deprecated. Composer reads the old settings (`audit.ignore`, `audit.ignore-severity` and
+  `audit.block-insecure`) only when `config.policy.advisories` is absent. If the project has old `audit`
+  settings, move all of them to `policy` in the same change.
+- `composer audit` also fails on abandoned packages. Remove or replace the package if that is possible. If it is
+  not possible, ignore the package with a reason:
+
+  ```json
+  {
+      "config": {
+          "policy": {
+              "abandoned": {
+                  "ignore": {
+                      "vendor/package": "No replacement exists. We use only the X component. Reviewed 2026-11-18."
+                  }
+              }
+          }
+      }
+  }
+  ```
+
 ## CVE/advisory update
 
 1. Find the affected packages: `composer audit` (and `npm audit`).
@@ -56,7 +103,8 @@ before we install it.
    composer update 'symfony/*' --no-cooldown
    ```
 
-5. Run `composer audit` again. It must report no advisories.
+5. Run `composer audit` again. It must report no advisories. If a package cannot be updated, ignore the
+   advisory by ID with a reason (see [Composer audit](#composer-audit)).
 6. Commit `composer.lock` and the generated files that changed.
 7. Run the tests, and make sure that CI passes.
 8. Add a changelog entry and make a pull request.
@@ -156,8 +204,10 @@ composer recipes:update vendor/package
 
 ### Step 8: Check and test before the release
 
-- Run `composer audit`, `composer outdated --direct --minor-only` and `composer recipes --outdated`. Only versions
-  that are still in the cooldown can remain.
+- Run `composer outdated --direct --minor-only` and `composer recipes --outdated`. Only versions that are still
+  in the cooldown can remain.
+- Run `composer audit`. It must report no advisories and no abandoned packages (see
+  [Composer audit](#composer-audit)).
 - Run PHPStan with `phpstan/phpstan-deprecation-rules` (see [Deprecations](#deprecations)).
 - Run the full test suite with coverage, as in CI (for example `task test`). Some warnings only occur with
   coverage, for example `#[CoversClass]` on a class outside `src/`.
@@ -199,5 +249,7 @@ deprecations.
 - Do not update direct dependencies to a new major version in the quarterly update. This needs an agreement with
   the customer.
 - Do not use `--no-cooldown` for more packages than the advisory affects.
+- Do not ignore an advisory by package name, and do not ignore an advisory or an abandoned package without a
+  reason.
 - Do not add application fixes or features to an update pull request. Make a separate pull request.
 - Do not make the PHPStan baseline larger to make an update pass.
