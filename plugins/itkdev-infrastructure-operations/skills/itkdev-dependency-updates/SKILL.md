@@ -1,6 +1,6 @@
 ---
 name: itkdev-dependency-updates
-description: Update the dependencies of an ITK Dev project (Symfony or Drupal). Two scenarios - a fast CVE/advisory update ("skal gå stærkt") of only the affected packages, or the quarterly maintenance update (kvartalsvis opdatering, cybersikkerhedsaftale) of templates, images, PHP and all dependencies. Use when composer audit, npm audit, importmap:audit or drush pm:security reports an advisory, when a CVE or security release is published, or when the user asks for the quarterly update, a cybersikkerhedsaftale update, or a dependency, template or PHP version update.
+description: Update the dependencies of an ITK Dev project (Symfony or Drupal). Two scenarios - a fast CVE/advisory update ("skal gå stærkt") of only the affected packages, or the quarterly maintenance update (kvartalsvis opdatering, cybersikkerhedsaftale) of templates, images, PHP and all dependencies. Use when composer audit, npm audit or importmap:audit reports an advisory, when a CVE or security release is published, or when the user asks for the quarterly update, a cybersikkerhedsaftale update, or a dependency, template or PHP version update.
 ---
 
 # Dependency updates
@@ -121,8 +121,9 @@ trivial, stop and tell the user. The user must tell the project manager (PL).
 
 ### Steps
 
-1. Find the affected packages: `composer audit` (and `npm audit`). In Drupal projects, also run
-   `drush pm:security`. In Symfony projects with AssetMapper, also run `bin/console importmap:audit`.
+1. Find the affected packages: `composer audit` (and `npm audit`). In Symfony projects with AssetMapper, also
+   run `bin/console importmap:audit`. In Drupal projects, `composer audit` also reports advisories for Drupal
+   core and modules. Do not use `drush pm:security`. Drush removed it in favour of `composer audit`.
 2. Find all projects that use the affected packages, and update all of them. Remember projects that belong
    together, for example an application and its API.
 3. Make a branch: `hotfix/x.y.z` from `main`. If a release from `develop` is near, you can make the update
@@ -294,8 +295,7 @@ Do the steps that apply only to the framework of the project: [Symfony](#symfony
   versions that are still in the cooldown can remain.
 - Run `composer audit`. It must report no advisories and no abandoned packages (see
   [Composer audit](#composer-audit)).
-- Drupal: run `drush pm:security` and `drush config:status`. The configuration must have no changes that are
-  not exported.
+- Drupal: run `drush config:status`. The configuration must have no changes that are not exported.
 - Run PHPStan with `phpstan/phpstan-deprecation-rules` (see [Deprecations](#deprecations)).
 - Run the full test suite with coverage, as in CI (for example `task test`). Some warnings only occur with
   coverage, for example `#[CoversClass]` on a class outside `src/`.
